@@ -2,10 +2,10 @@ COMPOSE := docker compose -f infra/docker-compose.yml
 API_DIR := apps/api
 WEB_DIR := apps/web
 
-.PHONY: help db-up db-down migrate seed demo api web test lint
+.PHONY: help db-up db-down migrate seed demo api web test lint evaluate
 
 help:
-	@echo "Targets: db-up db-down migrate seed demo api web test lint"
+	@echo "Targets: db-up db-down migrate seed demo api web test lint evaluate"
 
 db-up:
 	$(COMPOSE) up -d db
@@ -35,3 +35,6 @@ test:  ## api and web tests
 lint:  ## api lint, web type-check and lint
 	cd $(API_DIR) && uv run ruff check . && uv run ruff format --check .
 	cd $(WEB_DIR) && pnpm typecheck && pnpm lint
+
+evaluate:  ## assignment strategy comparison -> docs/evaluation.md (no database needed)
+	cd $(API_DIR) && uv run python -m scripts.evaluate
