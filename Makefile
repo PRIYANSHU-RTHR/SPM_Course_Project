@@ -1,16 +1,19 @@
 COMPOSE := docker compose -f infra/docker-compose.yml
 API_DIR := apps/api
 
-.PHONY: help db-up db-down seed demo api web test lint
+.PHONY: help db-up db-down migrate seed demo api web test lint
 
 help:
-	@echo "Targets: db-up db-down seed demo api web test lint"
+	@echo "Targets: db-up db-down migrate seed demo api web test lint"
 
 db-up:
 	$(COMPOSE) up -d db
 
 db-down:
 	$(COMPOSE) down
+
+migrate:
+	cd $(API_DIR) && uv run alembic upgrade head
 
 seed:
 	@echo "seed: added in step 04"
