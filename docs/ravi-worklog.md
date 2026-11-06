@@ -11,7 +11,7 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 | Step | Work | Status | Waiting for |
 |---|---|---|---|
 | 18 | Web scaffold and design system | Done, in [PR #1](https://github.com/PRIYANSHU-RTHR/SPM_Course_Project/pull/1), not merged | PR review by a teammate |
-| 04 | Seed data | Done, on `feat/04-seed-data`, no PR yet | PR and review |
+| 04 | Seed data | Done, in [PR #2](https://github.com/PRIYANSHU-RTHR/SPM_Course_Project/pull/2), not merged | PR review by a teammate |
 | 19 | Projects list and overview | Next after 18 merges | 18 merged. Real data needs 05–11; mocks until then |
 | 21 | Network graph and Gantt | Not started | 19. Real data needs 07, 09 |
 | 20 | New project flow | Not started | Mock SSE until 15 merges |
@@ -28,8 +28,8 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 
 ## Next actions
 
-1. Get Step 18 reviewed and merged.
-2. Open a PR for Step 04. Priyanshu's Step 05 can use the seed for manual testing.
+1. Get PR #1 (Step 18) and PR #2 (Step 04) reviewed and merged. They can merge in either order.
+2. Tell Priyanshu that PR #2 is ready. Step 05 can use the seed for manual testing.
 3. Raise the two engine problems under "Questions for the team". They affect the demo story.
 4. Do Step 19 on `feat/19-overview`, branched from `main` after Step 18 merges.
 
@@ -96,6 +96,7 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 - [ ] **Priyanshu:** confirm Step 05 list responses are `{items, total, limit, offset}`, money is a string, and `/members` includes `skills` and `availability`. The mocks assume all three.
 - [ ] **Manveer, Priyanshu:** `forecast()` reads only tasks, so it ignores members, leave and progress. "Bob on leave" cannot drop P(on time) from 81% to 47% until Step 17 feeds leave into it.
 - [ ] **Manveer:** Monte Carlo gives 82% on time for a 2026-12-01 deadline, but the scheduler finishes on 2026-12-07 because it rounds tasks to whole days. Which number should the demo show?
+- [ ] **Manveer:** which `score_breakdown` shape should be stored? The seed follows the Step 03 model comment (`score`), but the assignment engine uses `total` and more fields.
 - [ ] **Priyanshu:** does a newer `docs/temp.md` exist? The copy in git history stops at Step 02.
 
 ### Setup notes
