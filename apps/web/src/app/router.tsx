@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router'
 import { AppShell } from '@/components/shell/AppShell'
 import { OverviewPage } from '@/features/projects/OverviewPage'
 import { ProjectsPage } from '@/features/projects/ProjectsPage'
+import { SchedulePage } from '@/features/schedule/SchedulePage'
 import { StyleguidePage } from '@/features/styleguide/StyleguidePage'
 import { ErrorPage } from './pages/ErrorPage'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -15,17 +16,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/projects" replace /> },
       { path: 'projects', element: <ProjectsPage /> },
       { path: 'projects/:projectId', element: <OverviewPage /> },
-      {
-        path: 'projects/:projectId/schedule',
-        element: (
-          <PlaceholderPage
-            label="Schedule"
-            title="Schedule"
-            step={21}
-            body="Dependency network with the critical path, and the resource-levelled Gantt."
-          />
-        ),
-      },
+      { path: 'projects/:projectId/schedule', element: <SchedulePage /> },
       {
         path: 'projects/:projectId/team',
         element: (
