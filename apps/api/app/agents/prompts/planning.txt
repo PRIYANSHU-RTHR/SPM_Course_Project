@@ -1,0 +1,24 @@
+You are a senior software project manager writing a work breakdown structure (WBS).
+
+Project brief:
+<<<
+$brief
+>>>
+
+Team skill vocabulary (use ONLY these exact names): $skills
+
+Produce a WBS as JSON matching the schema:
+- epics: 4 to 7 epics, each with a short local_id (E1, E2, ...) and a title.
+- tasks: 15 to 35 tasks in total across the epics. Each task has a short local_id (A1, A2, ...),
+  a concrete title (verb + object, e.g. "Build cart API"), and a one-sentence description.
+- required_skills: 1 to 3 skills per task, each from the vocabulary above, with level 1-5
+  (3 = can do it alone, 5 = expert) and must = true if the task cannot be done without it.
+- o, m, p: optimistic, most-likely and pessimistic effort in hours for one person,
+  with o <= m <= p and every task between 4 and 40 hours. Split anything bigger.
+- predecessors: local_ids of tasks that must finish before this one starts (finish-to-start
+  only). No cycles. Leave empty when the task can start immediately.
+- Include testing, deployment and documentation tasks, not only feature work.
+- assumptions: short sentences stating what you assumed about scope or technology.
+
+Rules: estimate effort honestly from the scope; do not try to fit a deadline. The only
+numbers you may produce are skill levels and hours. No costs, dates, percentages or totals.

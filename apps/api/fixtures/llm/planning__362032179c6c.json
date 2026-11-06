@@ -1,0 +1,598 @@
+{
+  "prompt_name": "planning",
+  "model": "hand-written",
+  "prompt_hash": "362032179c6c0bdc3adde2776837dd1a0813c3d6fa96c3469b9aaf312e4bf61d",
+  "recorded_at": "2026-11-06T00:00:00+00:00",
+  "usage": {},
+  "response_json": {
+    "epics": [
+      {
+        "local_id": "E1",
+        "title": "Auth & Profiles",
+        "tasks": [
+          {
+            "local_id": "A1",
+            "title": "Design data model and API contract",
+            "description": "Define tables for students, canteens, menu items, orders and payments plus the REST contract.",
+            "required_skills": [
+              {
+                "skill": "postgres",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "fastapi",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 6,
+            "m": 10,
+            "p": 16,
+            "predecessors": []
+          },
+          {
+            "local_id": "A2",
+            "title": "Set up repo, CI and Docker dev stack",
+            "description": "Monorepo, lint and test pipeline, Docker Compose with Postgres for local development.",
+            "required_skills": [
+              {
+                "skill": "devops",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "docker",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 6,
+            "m": 8,
+            "p": 14,
+            "predecessors": []
+          },
+          {
+            "local_id": "A3",
+            "title": "Build email OTP sign-in",
+            "description": "Send OTP to college email, verify it, issue session tokens with expiry.",
+            "required_skills": [
+              {
+                "skill": "fastapi",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "security",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 10,
+            "m": 14,
+            "p": 24,
+            "predecessors": [
+              "A1",
+              "A2"
+            ]
+          },
+          {
+            "local_id": "A4",
+            "title": "Build student profile and order history API",
+            "description": "Profile CRUD and paginated order history per student.",
+            "required_skills": [
+              {
+                "skill": "fastapi",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "postgres",
+                "level": 2,
+                "must": true
+              }
+            ],
+            "o": 6,
+            "m": 10,
+            "p": 16,
+            "predecessors": [
+              "A3"
+            ]
+          },
+          {
+            "local_id": "A5",
+            "title": "Build sign-in and profile screens",
+            "description": "Mobile-first web screens for OTP sign-in, profile and order history.",
+            "required_skills": [
+              {
+                "skill": "reactjs",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "typescript",
+                "level": 2,
+                "must": true
+              }
+            ],
+            "o": 8,
+            "m": 12,
+            "p": 18,
+            "predecessors": [
+              "A3"
+            ]
+          }
+        ]
+      },
+      {
+        "local_id": "E2",
+        "title": "Menu & Catalogue",
+        "tasks": [
+          {
+            "local_id": "B1",
+            "title": "Build canteen and menu API",
+            "description": "Canteens, categories, items with price, veg tag and availability.",
+            "required_skills": [
+              {
+                "skill": "fastapi",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "PostgreSQL",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 8,
+            "m": 12,
+            "p": 20,
+            "predecessors": [
+              "A1"
+            ]
+          },
+          {
+            "local_id": "B2",
+            "title": "Build menu browsing screens",
+            "description": "Canteen list, category tabs, item cards with veg/non-veg tags and stock state.",
+            "required_skills": [
+              {
+                "skill": "react",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "ui-design",
+                "level": 2,
+                "must": false
+              }
+            ],
+            "o": 10,
+            "m": 14,
+            "p": 22,
+            "predecessors": [
+              "B1"
+            ]
+          },
+          {
+            "local_id": "B3",
+            "title": "Design UI kit and screen flows",
+            "description": "Wireframes and a small component kit for student and vendor screens.",
+            "required_skills": [
+              {
+                "skill": "ui-design",
+                "level": 4,
+                "must": true
+              }
+            ],
+            "o": 8,
+            "m": 12,
+            "p": 18,
+            "predecessors": []
+          },
+          {
+            "local_id": "B4",
+            "title": "Build Android menu and cart screens",
+            "description": "Native Android screens for menus and cart sharing the same API.",
+            "required_skills": [
+              {
+                "skill": "android",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 16,
+            "m": 24,
+            "p": 36,
+            "predecessors": [
+              "B1",
+              "B3"
+            ]
+          }
+        ]
+      },
+      {
+        "local_id": "E3",
+        "title": "Ordering & Payments",
+        "tasks": [
+          {
+            "local_id": "C1",
+            "title": "Build cart and checkout API",
+            "description": "Cart per student, price snapshot at checkout, order creation with idempotency key.",
+            "required_skills": [
+              {
+                "skill": "fastapi",
+                "level": 4,
+                "must": true
+              },
+              {
+                "skill": "postgres",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 12,
+            "m": 18,
+            "p": 28,
+            "predecessors": [
+              "B1",
+              "A4"
+            ]
+          },
+          {
+            "local_id": "C2",
+            "title": "Integrate UPI payment gateway",
+            "description": "Create payment intents, handle gateway redirects and verify signatures; store only the transaction id.",
+            "required_skills": [
+              {
+                "skill": "payments",
+                "level": 4,
+                "must": true
+              },
+              {
+                "skill": "security",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 16,
+            "m": 24,
+            "p": 40,
+            "predecessors": [
+              "C1"
+            ]
+          },
+          {
+            "local_id": "C3",
+            "title": "Handle payment webhooks and refunds",
+            "description": "Process success, failure and refund webhooks; refund rejected orders automatically.",
+            "required_skills": [
+              {
+                "skill": "payments",
+                "level": 4,
+                "must": true
+              },
+              {
+                "skill": "fastapi",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 10,
+            "m": 16,
+            "p": 28,
+            "predecessors": [
+              "C2"
+            ]
+          },
+          {
+            "local_id": "C4",
+            "title": "Build order status state machine",
+            "description": "Placed, accepted, ready, picked up, rejected transitions with audit timestamps.",
+            "required_skills": [
+              {
+                "skill": "fastapi",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "postgres",
+                "level": 2,
+                "must": true
+              }
+            ],
+            "o": 8,
+            "m": 12,
+            "p": 20,
+            "predecessors": [
+              "C1"
+            ]
+          },
+          {
+            "local_id": "C5",
+            "title": "Add push notifications for order status",
+            "description": "Web push and Android notifications when an order is accepted or ready.",
+            "required_skills": [
+              {
+                "skill": "nodejs",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "android",
+                "level": 2,
+                "must": false
+              }
+            ],
+            "o": 8,
+            "m": 12,
+            "p": 20,
+            "predecessors": [
+              "C4"
+            ]
+          },
+          {
+            "local_id": "C6",
+            "title": "Build cart, checkout and order tracking screens",
+            "description": "Cart, UPI checkout redirect and live order status screens.",
+            "required_skills": [
+              {
+                "skill": "react",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "typescript",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 12,
+            "m": 16,
+            "p": 26,
+            "predecessors": [
+              "C2",
+              "B2"
+            ]
+          }
+        ]
+      },
+      {
+        "local_id": "E4",
+        "title": "Vendor Dashboard",
+        "tasks": [
+          {
+            "local_id": "D1",
+            "title": "Build vendor order queue API",
+            "description": "Queue of incoming orders per canteen with accept, reject and ready actions.",
+            "required_skills": [
+              {
+                "skill": "fastapi",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 8,
+            "m": 12,
+            "p": 18,
+            "predecessors": [
+              "C4"
+            ]
+          },
+          {
+            "local_id": "D2",
+            "title": "Build vendor dashboard screens",
+            "description": "Order queue, stock toggles and quick actions for counter staff.",
+            "required_skills": [
+              {
+                "skill": "react",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "ui-design",
+                "level": 2,
+                "must": false
+              }
+            ],
+            "o": 12,
+            "m": 16,
+            "p": 24,
+            "predecessors": [
+              "D1",
+              "B3"
+            ]
+          },
+          {
+            "local_id": "D3",
+            "title": "Build daily sales report with CSV export",
+            "description": "Daily totals per item and payment status, downloadable as CSV.",
+            "required_skills": [
+              {
+                "skill": "python",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "postgres",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 6,
+            "m": 10,
+            "p": 16,
+            "predecessors": [
+              "C3"
+            ]
+          },
+          {
+            "local_id": "D4",
+            "title": "Build admin screens for canteens and vendors",
+            "description": "Admin can add canteens and create vendor accounts.",
+            "required_skills": [
+              {
+                "skill": "react",
+                "level": 2,
+                "must": true
+              },
+              {
+                "skill": "fastapi",
+                "level": 2,
+                "must": true
+              }
+            ],
+            "o": 6,
+            "m": 8,
+            "p": 14,
+            "predecessors": [
+              "D1"
+            ]
+          }
+        ]
+      },
+      {
+        "local_id": "E5",
+        "title": "Release",
+        "tasks": [
+          {
+            "local_id": "R1",
+            "title": "Write API and payment integration tests",
+            "description": "Automated tests for ordering, payment webhooks and refunds, including failure cases.",
+            "required_skills": [
+              {
+                "skill": "testing",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "payments",
+                "level": 2,
+                "must": false
+              }
+            ],
+            "o": 10,
+            "m": 16,
+            "p": 24,
+            "predecessors": [
+              "C3",
+              "D1"
+            ]
+          },
+          {
+            "local_id": "R2",
+            "title": "Run end-to-end and device testing",
+            "description": "Test the main flows on web and two Android devices; log and triage bugs.",
+            "required_skills": [
+              {
+                "skill": "QA",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 8,
+            "m": 12,
+            "p": 20,
+            "predecessors": [
+              "C6",
+              "D2",
+              "B4"
+            ]
+          },
+          {
+            "local_id": "R3",
+            "title": "Security review of auth and payments",
+            "description": "Review OTP flow, token handling and gateway signature checks against OWASP basics.",
+            "required_skills": [
+              {
+                "skill": "security",
+                "level": 4,
+                "must": true
+              }
+            ],
+            "o": 6,
+            "m": 8,
+            "p": 14,
+            "predecessors": [
+              "C3",
+              "A3"
+            ]
+          },
+          {
+            "local_id": "R4",
+            "title": "Write production Docker setup and deploy",
+            "description": "Production images, environment config and deployment on the college servers.",
+            "required_skills": [
+              {
+                "skill": "docker",
+                "level": 3,
+                "must": true
+              },
+              {
+                "skill": "devops",
+                "level": 3,
+                "must": true
+              }
+            ],
+            "o": 8,
+            "m": 12,
+            "p": 20,
+            "predecessors": [
+              "R1",
+              "R3"
+            ]
+          },
+          {
+            "local_id": "R5",
+            "title": "Write user, vendor and ops documentation",
+            "description": "Short guides for students and vendors plus a runbook for the IT team.",
+            "required_skills": [
+              {
+                "skill": "ui-design",
+                "level": 1,
+                "must": false
+              }
+            ],
+            "o": 4,
+            "m": 6,
+            "p": 10,
+            "predecessors": [
+              "R2"
+            ]
+          },
+          {
+            "local_id": "R6",
+            "title": "Pilot launch with one canteen",
+            "description": "Soft launch with one canteen, monitor errors and fix blockers before full rollout.",
+            "required_skills": [
+              {
+                "skill": "devops",
+                "level": 2,
+                "must": true
+              },
+              {
+                "skill": "testing",
+                "level": 2,
+                "must": true
+              }
+            ],
+            "o": 8,
+            "m": 12,
+            "p": 20,
+            "predecessors": [
+              "R4",
+              "R2",
+              "R5"
+            ]
+          }
+        ]
+      }
+    ],
+    "assumptions": [
+      "Students sign in with their college email; no social login.",
+      "One payment gateway with UPI support; card payments are out of scope.",
+      "Push notifications use web push on the web app and the native channel on Android.",
+      "The college IT team provides servers that can run Docker."
+    ]
+  }
+}
