@@ -154,7 +154,7 @@ class AssignmentPlan:
 
 
 # --------------------------------------------------------------------------------------
-# Steps 07, 09-11 — placeholders (field names fixed now, engines come later)
+# Results for Steps 07 and 09; placeholders for 10-11 (field names fixed now)
 # --------------------------------------------------------------------------------------
 
 
@@ -181,24 +181,29 @@ class CPMResult:
 @dataclass(frozen=True, slots=True)
 class ScheduledTask:
     task_id: int
-    member_id: int | None
-    start: date
-    end: date
+    member_id: int | None  # None = unassigned, scheduled on the plain project calendar
+    start: date  # first working day with hours on this task
+    end: date  # last working day with hours on this task
+    hours: float  # effort placed (te unless overridden)
+    early_start: date  # CPM early start on the project calendar
+    resource_delay_days: int  # working days start is later than early_start
 
 
 @dataclass(frozen=True, slots=True)
 class MemberWeekLoad:
     member_id: int
-    week_start: date  # Monday
-    hours: float
-    capacity: float
+    week_start: date  # Monday of the ISO week
+    hours: float  # hours booked that week
+    capacity: float  # hours available that week (leave removed)
+    utilisation: float  # hours / capacity, 0 when capacity is 0
 
 
 @dataclass(frozen=True, slots=True)
 class ScheduleResult:
-    tasks: tuple[ScheduledTask, ...]
-    loads: tuple[MemberWeekLoad, ...]
-    finish: date
+    tasks: tuple[ScheduledTask, ...]  # in placement order
+    loads: tuple[MemberWeekLoad, ...]  # every member x every week, project start to finish
+    finish: date  # last end date (project start if there are no tasks)
+    delayed: tuple[int, ...]  # task ids with resource_delay_days > 0
 
 
 @dataclass(frozen=True, slots=True)
