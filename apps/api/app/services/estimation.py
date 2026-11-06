@@ -1,6 +1,5 @@
 """Builds engine inputs from the DB and runs the estimation engine."""
 
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.engines.estimation import (
@@ -11,23 +10,13 @@ from app.engines.estimation import (
     path_pert,
     pert,
 )
-from app.engines.types import TaskInput
-from app.errors import NotFoundError
-from app.models import Project, Task
 from app.schemas.estimate import Cocomo, ProjectEstimate, TaskPert
+from app.services.inputs import get_project, load_tasks
 
 
 def project_estimate(session: Session, project_id: int) -> ProjectEstimate:
-    if session.get(Project, project_id) is None:
-        raise NotFoundError(f"Project {project_id} not found", details={"project_id": project_id})
-
-    rows = session.scalars(
-        select(Task).where(Task.project_id == project_id).order_by(Task.id)
-    ).all()
-    tasks = [
-        TaskInput(id=t.id, o=t.optimistic_hours, m=t.most_likely_hours, p=t.pessimistic_hours)
-        for t in rows
-    ]
+    get_project(session, project_id)
+    tasks = load_tasks(session, project_id)
     total = path_pert(tasks)  # all tasks: total effort, not a schedule path
 
     cocomo = None

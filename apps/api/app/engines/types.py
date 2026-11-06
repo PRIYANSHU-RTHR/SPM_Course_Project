@@ -99,7 +99,62 @@ class CocomoResult:
 
 
 # --------------------------------------------------------------------------------------
-# Steps 07-11 — placeholders (field names fixed now, engines come later)
+# Step 08 — assignment
+# --------------------------------------------------------------------------------------
+
+
+@dataclass(frozen=True, slots=True)
+class SkillMatch:
+    skill: str
+    required: int  # required level
+    has: int  # member level, 0 if missing
+    weight: float  # normalised weight (all of a task's weights sum to 1)
+    fit: float  # min(has / required, 1)
+
+
+@dataclass(frozen=True, slots=True)
+class ScoreBreakdown:
+    """score = 100 * (w_skill * skill_fit + w_capacity * capacity_fit + w_balance * balance)."""
+
+    total: float  # 0-100
+    skill_fit: float  # 0-1, weighted mean of SkillMatch.fit (1 if the task needs no skills)
+    capacity_fit: float  # 0-1, free hours in the task window / task hours
+    balance: float  # 0-1, 1 - utilisation / max team utilisation
+    skill_part: float  # points contributed by skill_fit (0-100 scale)
+    capacity_part: float
+    balance_part: float
+    free_hours: float  # member hours still free in the task window
+    utilisation: float  # member committed hours / capacity over the project horizon
+    skills: tuple[SkillMatch, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class Candidate:
+    member_id: int
+    score: ScoreBreakdown
+
+
+@dataclass(frozen=True, slots=True)
+class TaskRecommendation:
+    task_id: int
+    member_id: int | None  # chosen member; None = nobody eligible
+    score: ScoreBreakdown | None  # breakdown for the chosen member
+    candidates: tuple[Candidate, ...]  # top 3 eligible, best first
+    ineligible: tuple[tuple[int, str], ...] = ()  # (member id, reason)
+
+
+@dataclass(frozen=True, slots=True)
+class AssignmentPlan:
+    mode: str  # "greedy" | "optimal"
+    recommendations: tuple[TaskRecommendation, ...]
+    utilisation: dict[int, float]  # member id -> utilisation after the plan
+    total_score: float  # sum of chosen scores
+    utilisation_std: float  # population std-dev of member utilisation
+    unassigned: int
+
+
+# --------------------------------------------------------------------------------------
+# Steps 07, 09-11 — placeholders (field names fixed now, engines come later)
 # --------------------------------------------------------------------------------------
 
 

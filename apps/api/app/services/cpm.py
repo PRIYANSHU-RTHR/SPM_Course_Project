@@ -1,47 +1,14 @@
 """Builds the dependency network from the DB and runs the CPM engine."""
 
-from collections import defaultdict
-
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.engines.cpm import CycleError, cpm
-from app.engines.types import TaskInput
-from app.errors import ConflictError, NotFoundError
-from app.models import Dependency, Project, Task
 from app.schemas.cpm import CpmTask, ProjectCpm
+from app.services.inputs import get_project, load_tasks, run_cpm
 
 
 def project_cpm(session: Session, project_id: int) -> ProjectCpm:
-    if session.get(Project, project_id) is None:
-        raise NotFoundError(f"Project {project_id} not found", details={"project_id": project_id})
-
-    rows = session.scalars(
-        select(Task).where(Task.project_id == project_id).order_by(Task.id)
-    ).all()
-    preds: dict[int, list[int]] = defaultdict(list)
-    deps = session.execute(
-        select(Dependency.pred_task_id, Dependency.succ_task_id)
-        .join(Task, Task.id == Dependency.succ_task_id)
-        .where(Task.project_id == project_id)
-    )
-    for pred, succ in deps:
-        preds[succ].append(pred)
-
-    tasks = [
-        TaskInput(
-            id=t.id,
-            o=t.optimistic_hours,
-            m=t.most_likely_hours,
-            p=t.pessimistic_hours,
-            predecessors=tuple(preds[t.id]),
-        )
-        for t in rows
-    ]
-    try:
-        result = cpm(tasks)
-    except CycleError as exc:
-        raise ConflictError(str(exc), details={"cycle": exc.cycle}) from exc
+    get_project(session, project_id)
+    result = run_cpm(load_tasks(session, project_id))
 
     return ProjectCpm(
         project_id=project_id,
