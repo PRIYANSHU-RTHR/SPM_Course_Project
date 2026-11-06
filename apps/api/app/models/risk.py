@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from sqlalchemy import CheckConstraint, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import CheckConstraint, ForeignKey, String, Text, UniqueConstraint, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -30,6 +30,10 @@ class Risk(TimestampMixin, Base):
     impact: Mapped[int]
     status: Mapped[RiskStatus] = mapped_column(
         pg_enum(RiskStatus, "risk_status"), default=RiskStatus.OPEN, server_default="open"
+    )
+    # Numbers that made the rule fire, from the risk engine; refreshed on every detection run.
+    evidence: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default=text("'{}'::jsonb")
     )
     # {"mitigation": str, "monitoring": str, "management": str} from the risk agent.
     rmmm: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
