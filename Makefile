@@ -1,4 +1,5 @@
 COMPOSE := docker compose -f infra/docker-compose.yml
+API_DIR := apps/api
 
 .PHONY: help db-up db-down seed demo api web test lint
 
@@ -18,13 +19,13 @@ demo:
 	@echo "demo: added in step 26"
 
 api:
-	@echo "api: added in step 02"
+	cd $(API_DIR) && uv run uvicorn app.main:app --reload
 
 web:
 	@echo "web: added in step 18"
 
-test:
-	@echo "test: added in step 02"
+test:  ## api tests (web tests join in step 18)
+	cd $(API_DIR) && uv run pytest -q
 
-lint:
-	@echo "lint: added in step 02"
+lint:  ## api lint (web lint joins in step 18)
+	cd $(API_DIR) && uv run ruff check . && uv run ruff format --check .
