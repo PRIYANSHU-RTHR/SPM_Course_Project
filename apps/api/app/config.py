@@ -4,7 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import SecretStr, field_validator
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 # apps/api/app/config.py -> repo root is three levels up from this file's directory.
@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     llm_mode: LlmMode = "fixture"
     gemini_model: str | None = None
     gemini_api_key: SecretStr | None = None
+    llm_timeout_seconds: float = Field(default=60.0, gt=0, le=600)
     sim_seed: int = 42
 
     @field_validator("cors_origins", mode="before")
