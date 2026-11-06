@@ -6,29 +6,39 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.engines.evm import ZERO, earned_value, evm, hours_cost, money, planned_value
-from app.engines.types import BaselineTask
-from app.models import Snapshot, Task
+from app.engines.types import BaselineTask, EVMResult, ScheduleResult
+from app.models import Project, Snapshot, Task
 from app.schemas.evm import EvmPointOut, ProjectEvm
 from app.services.inputs import get_project
 from app.services.schedule import build_schedule
 
 
-def project_evm(session: Session, project_id: int, as_of: date) -> ProjectEvm:
-    project = get_project(session, project_id)
-    rate = project.hourly_rate
+def _baseline(project: Project, plan: ScheduleResult) -> list[BaselineTask]:
     # shortcut: baseline = today's schedule, recomputed per request; persisting a frozen
     # baseline needs a table (schema change), so re-planning currently moves PV too.
-    plan = build_schedule(session, project)
-    baseline = [
-        BaselineTask(t.task_id, t.start, t.end, hours_cost(t.hours, rate)) for t in plan.tasks
-    ]
-    bac = money(sum((b.budget for b in baseline), ZERO))
+    rate = project.hourly_rate
+    return [BaselineTask(t.task_id, t.start, t.end, hours_cost(t.hours, rate)) for t in plan.tasks]
 
+
+def build_evm(
+    session: Session, project: Project, as_of: date, plan: ScheduleResult | None = None
+) -> EVMResult:
+    """Raw engine result (used by the EVM endpoint and the risk service)."""
+    plan = plan or build_schedule(session, project)
+    baseline = _baseline(project, plan)
+    bac = money(sum((b.budget for b in baseline), ZERO))
     budget_of = {b.task_id: b.budget for b in baseline}
-    rows = session.scalars(select(Task).where(Task.project_id == project_id)).all()
+    rows = session.scalars(select(Task).where(Task.project_id == project.id)).all()
     ev = earned_value([budget_of[t.id] for t in rows], [t.percent_complete for t in rows])
-    ac = money(sum((hours_cost(t.actual_hours, rate) for t in rows), ZERO))
-    result = evm(bac, planned_value(baseline, as_of), ev, ac)
+    ac = money(sum((hours_cost(t.actual_hours, project.hourly_rate) for t in rows), ZERO))
+    return evm(bac, planned_value(baseline, as_of), ev, ac)
+
+
+def project_evm(session: Session, project_id: int, as_of: date) -> ProjectEvm:
+    project = get_project(session, project_id)
+    plan = build_schedule(session, project)
+    baseline = _baseline(project, plan)
+    result = build_evm(session, project, as_of, plan)
 
     snaps = session.scalars(
         select(Snapshot).where(Snapshot.project_id == project_id).order_by(Snapshot.date)
