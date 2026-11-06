@@ -10,28 +10,28 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 
 | Step | Work | Status | Waiting for |
 |---|---|---|---|
-| 18 | Web scaffold and design system | Done, in [PR #1](https://github.com/PRIYANSHU-RTHR/SPM_Course_Project/pull/1), not merged | PR review by a teammate |
-| 04 | Seed data | Done, in [PR #2](https://github.com/PRIYANSHU-RTHR/SPM_Course_Project/pull/2), not merged | PR review by a teammate |
-| 19 | Projects list and overview | Next after 18 merges | 18 merged. Real data needs 05–11; mocks until then |
-| 21 | Network graph and Gantt | Not started | 19. Real data needs 07, 09 |
-| 20 | New project flow | Not started | Mock SSE until 15 merges |
-| 22 | Team and assignment views | Not started | Mocks until 08, 09, 16 merge |
-| 23 | Risk, EVM and forecast views | Not started | Mocks until 10, 11, 12, 16 merge |
+| 18 | Web scaffold and design system | Merged | Nothing |
+| 04 | Seed data | Merged | Nothing |
+| 19 | Projects list and overview | Done, on `feat/19-overview`, no PR yet | PR and review |
+| 21 | Network graph and Gantt | Next | Step 19 merged. Real data is ready |
+| 23 | Risk, EVM and forecast views | Ready after 19 | AI plans need Step 16 merged |
+| 22 | Team and assignment views | Ready after 19 | AI explanations need Step 16 merged |
+| 20 | New project flow | Not started | Mock stream until Step 15 exists |
 | 24 (UI) | Disruption simulator, approvals, audit | Blocked | 17 and Priyanshu's Step 24 API work merged |
 | 27 | Docs, polish, deploy | Blocked | 26 merged |
 
 **Team progress on 2026-11-06**
 
-- On `main`: Steps 01, 02, 03.
-- Pushed by Manveer, not merged: Steps 06 to 11. They do not overlap with Step 18, and the Step 04 changes apply cleanly on them.
-- Not started on GitHub: Step 05 (CRUD APIs).
+- On `main`: Steps 01 to 13, and 18.
+- Pushed by Manveer, not merged: Steps 14 and 16, and the evaluation report.
+- Not on GitHub yet: Steps 15, 17, 24 (API), 25, 26.
+- Shared git history was rewritten on 2026-11-06. Old local branches must not be pushed.
 
 ## Next actions
 
-1. Get PR #1 (Step 18) and PR #2 (Step 04) reviewed and merged. They can merge in either order.
-2. Tell Priyanshu that PR #2 is ready. Step 05 can use the seed for manual testing.
-3. Raise the two engine problems under "Questions for the team". They affect the demo story.
-4. Do Step 19 on `feat/19-overview`, branched from `main` after Step 18 merges.
+1. Open a PR for Step 19 and get it reviewed.
+2. Raise the open questions below. The forecast one blocks the demo story.
+3. Start Step 21 on `feat/21-network-gantt`, branched from `main` after Step 19 merges.
 
 ## Work done
 
@@ -55,7 +55,7 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 
 - TypeScript is pinned to 5.9, because `openapi-typescript` crashes on TypeScript 7.
 - In Tailwind classes, `brand` is the blue `--accent` token. `accent` is shadcn's hover surface.
-- `src/lib/api/provisional.ts` holds temporary hand-written types until Step 05 exists.
+- `src/lib/api/provisional.ts` held temporary hand-written types until Step 05 existed. Step 19 deleted it.
 - Added Vitest early, because the Makefile said web tests join in Step 18.
 
 ### Step 04 · Seed data (2026-11-06)
@@ -79,21 +79,43 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 - Budget is ₹5,20,000, because the planned work totals about ₹4.6 lakh.
 - Tuned the data only. The engines are unchanged.
 
+### Step 19 · Projects list and overview (2026-11-06)
+
+**Built**
+
+- `/projects` table: deadline, progress, P(on time), SPI and open risks.
+- `/projects/:id`: header, 6 KPIs with formula tooltips, S-curve, next critical tasks and top risks.
+- Skeleton, empty and error states for every section.
+- The app now runs on the real API with generated types. The temporary mock data is gone.
+- `make seed` now runs risk detection, so the demo starts with 4 open risks.
+
+**Checked**
+
+- Typecheck, lint, 20 web tests and build pass. All 168 API tests pass.
+- Tested on real data at 1440px and 390px, including an empty project, a missing project and the API being down.
+
+**Decisions**
+
+- No `owner` column, because the project table has no owner field.
+- Only SPI and CPI show a change, because only they have snapshot history.
+- An empty project shows no metrics. The forecast engine reports 100% on time for it, which would mislead.
+- Recharts loads only on pages with a chart.
+
 ## Future requirements
 
 ### For my next steps
 
-- **Step 19:** build the projects table and overview with skeleton, empty and error states. Check at 1440px and 390px.
-- **Step 19:** update `src/lib/api/mocks/data.ts` to match the seed: hours, statuses, skills, assignments and budget.
+- **Step 21:** build the dependency network and Gantt. It will show the 7 December finish next to 82% on time.
 - **After Step 17:** retune the seed so "Bob on leave" lands near the plan.md §4 numbers: 47%, then about 74% after approval.
 - **Step 23:** add `/projects/:id/control` and decide where it sits in the left rail.
-- **Step 27:** add the `g p` and `?` shortcuts, and fix the 520 kB main JS chunk with route-level code splitting.
-- **After Step 05 merges:** run `pnpm gen:api`, delete `provisional.ts`, and remove mocks for endpoints that now exist.
+- **Step 27:** add the `g p` and `?` shortcuts, and fix the 543 kB main JS chunk with route-level code splitting.
+- **After API changes:** run `pnpm gen:api` and fix any type errors.
 
 ### Questions for the team
 
 - [ ] **Priyanshu, Manveer:** agree one `risk.rmmm` format before Step 23. The Step 03 model says `mitigation, monitoring, management`; the Step 16 prompt says `mitigation, monitoring_trigger, contingency, owner_role`.
-- [ ] **Priyanshu:** confirm Step 05 list responses are `{items, total, limit, offset}`, money is a string, and `/members` includes `skills` and `availability`. The mocks assume all three.
+- [ ] **Team:** should projects have an owner? The Step 19 brief lists an owner column, but the project table has no such field.
+- [ ] **Priyanshu:** `ruff check` fails at `app/agents/llm.py:12` (line too long), which will fail CI in Step 25.
 - [ ] **Manveer, Priyanshu:** `forecast()` reads only tasks, so it ignores members, leave and progress. "Bob on leave" cannot drop P(on time) from 81% to 47% until Step 17 feeds leave into it.
 - [ ] **Manveer:** Monte Carlo gives 82% on time for a 2026-12-01 deadline, but the scheduler finishes on 2026-12-07 because it rounds tasks to whole days. Which number should the demo show?
 - [ ] **Manveer:** which `score_breakdown` shape should be stored? The seed follows the Step 03 model comment (`score`), but the assignment engine uses `total` and more fields.
@@ -104,5 +126,5 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 - On Node 26, corepack's pnpm crashes. Install pnpm with `npm i -g pnpm`.
 - Port 5432 is used by my `agentos` containers, so OrchestrAI's database runs on 5433. Export `POSTGRES_PORT=5433` and a matching `DATABASE_URL` before `make db-up` or `make seed`.
 - `make seed` wipes every OrchestrAI table in the database at `DATABASE_URL`.
-- Without a backend, run `pnpm dev:mock`, or copy `.env.example` to `.env` before `pnpm dev` or `make web`.
+- The web app now needs the API running: `make api`, then `make web`.
 - `PLAN.md`, `prompts.md` and `docs/temp.md` stay out of git. The team removed the plan and build log from the repo on purpose.
