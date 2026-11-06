@@ -1,0 +1,46 @@
+/* OrchestrAI design tokens (see CLAUDE.md "Design system"). Dark only. */
+:root {
+  color-scheme: dark;
+
+  --bg: #0a0a0b;
+  --surface: #111113;
+  --surface-2: #17171a;
+  --border: #232327;
+  --border-strong: #2f2f35;
+  --text: #ededef;
+  --text-muted: #9a9aa2;
+  --text-subtle: #63636b;
+  --accent: #4c8dff;
+  --accent-fg: #0a0a0b;
+  --success: #3fb950;
+  --warning: #d29922;
+  --danger: #f85149;
+  --radius: 6px;
+  --radius-card: 8px;
+
+  /*
+   * shadcn semantic variables, mapped onto the tokens above.
+   * shadcn calls its hover surface "accent", which clashes with our brand --accent.
+   * index.css resolves it: Tailwind `accent` = hover surface, Tailwind `brand` = --accent.
+   */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-fg);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--text);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--text-muted);
+  --destructive: var(--danger);
+  --input: var(--border-strong);
+  --ring: var(--accent);
+  --chart-1: var(--accent);
+  --chart-2: var(--text-muted);
+  --chart-3: var(--warning);
+  --chart-4: var(--success);
+  --chart-5: var(--danger);
+}

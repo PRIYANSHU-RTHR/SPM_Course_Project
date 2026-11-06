@@ -1,5 +1,6 @@
 COMPOSE := docker compose -f infra/docker-compose.yml
 API_DIR := apps/api
+WEB_DIR := apps/web
 
 .PHONY: help db-up db-down migrate seed demo api web test lint
 
@@ -25,10 +26,12 @@ api:
 	cd $(API_DIR) && uv run uvicorn app.main:app --reload
 
 web:
-	@echo "web: added in step 18"
+	cd $(WEB_DIR) && pnpm dev
 
-test:  ## api tests (web tests join in step 18)
+test:  ## api and web tests
 	cd $(API_DIR) && uv run pytest -q
+	cd $(WEB_DIR) && pnpm test
 
-lint:  ## api lint (web lint joins in step 18)
+lint:  ## api lint, web type-check and lint
 	cd $(API_DIR) && uv run ruff check . && uv run ruff format --check .
+	cd $(WEB_DIR) && pnpm typecheck && pnpm lint
