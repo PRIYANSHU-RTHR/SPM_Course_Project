@@ -9,10 +9,13 @@ async function enableMocks() {
   await worker.start({ onUnhandledFrame: 'bypass', quiet: true })
 }
 
-void enableMocks().then(() => {
-  createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-      <App />
-    </StrictMode>,
-  )
-})
+// Failed mocks must not leave a blank page: the app still starts against the real API.
+void enableMocks()
+  .catch((error: unknown) => console.error('Mocks did not start', error))
+  .finally(() => {
+    createRoot(document.getElementById('root')!).render(
+      <StrictMode>
+        <App />
+      </StrictMode>,
+    )
+  })

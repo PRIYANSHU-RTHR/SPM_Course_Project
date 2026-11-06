@@ -1,25 +1,12 @@
 import { AnimatedNumber } from '@/components/AnimatedNumber'
 import { KpiStat, KpiStatSkeleton } from '@/components/KpiStat'
 import { formatDelta, formatPercent, formatRatio } from '@/lib/format'
-import { evmDeltas, openRisks, overloadedMembers } from './metrics'
+import { evmDeltas, forecastStatus, indexStatus, openRisks, overloadedMembers } from './metrics'
 import { useCpm, useEvm, useForecast, useRisks, useSchedule } from './queries'
 
 const whole = (value: number) => String(Math.round(value))
 const percent = (value: number) => formatPercent(value)
 const ratio = (value: number) => formatRatio(value)
-
-/** Below 0.9 matches the risk engine's SPI and CPI rule; below 1 is behind plan. */
-function indexStatus(value: number | null | undefined) {
-  if (value == null) return undefined
-  if (value < 0.9) return 'danger'
-  return value < 1 ? 'warning' : undefined
-}
-
-/** Below 60% matches the risk engine's P(on time) rule. */
-function forecastStatus(value: number) {
-  if (value < 0.6) return 'danger'
-  return value < 0.8 ? 'warning' : undefined
-}
 
 const unavailable = <span className="text-subtle">—</span>
 

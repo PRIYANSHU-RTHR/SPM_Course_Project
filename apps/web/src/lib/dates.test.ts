@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   addDays,
   addWorkingDays,
+  dateAfterHours,
   daysBetween,
   isMonday,
   isWeekend,
@@ -33,6 +34,14 @@ describe('dates', () => {
   it('adds working days, skipping weekends', () => {
     expect(addWorkingDays('2026-11-06', 1)).toBe('2026-11-09')
     expect(addWorkingDays('2026-11-06', 0)).toBe('2026-11-06')
+  })
+
+  it('converts project hours to a finish date on the 8-hour calendar', () => {
+    expect(dateAfterHours('2026-11-02', 4)).toBe('2026-11-02')
+    expect(dateAfterHours('2026-11-02', 8)).toBe('2026-11-02')
+    expect(dateAfterHours('2026-11-02', 8.5)).toBe('2026-11-03')
+    expect(dateAfterHours('2026-11-02', 48)).toBe('2026-11-09')
+    expect(dateAfterHours('2026-11-02', 0)).toBe('2026-11-02')
   })
 
   it('rounds slack up to whole days', () => {

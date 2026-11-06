@@ -1,7 +1,9 @@
 import { createBrowserRouter, Navigate } from 'react-router'
 import { AppShell } from '@/components/shell/AppShell'
+import { ControlPage } from '@/features/control/ControlPage'
 import { OverviewPage } from '@/features/projects/OverviewPage'
 import { ProjectsPage } from '@/features/projects/ProjectsPage'
+import { RisksPage } from '@/features/risks/RisksPage'
 import { SchedulePage } from '@/features/schedule/SchedulePage'
 import { StyleguidePage } from '@/features/styleguide/StyleguidePage'
 import { ErrorPage } from './pages/ErrorPage'
@@ -28,17 +30,8 @@ export const router = createBrowserRouter([
           />
         ),
       },
-      {
-        path: 'projects/:projectId/risks',
-        element: (
-          <PlaceholderPage
-            label="Risks"
-            title="Risk register"
-            step={23}
-            body="Probability × impact matrix, risk register and RMMM plans."
-          />
-        ),
-      },
+      { path: 'projects/:projectId/risks', element: <RisksPage /> },
+      { path: 'projects/:projectId/control', element: <ControlPage /> },
       {
         path: 'plan/new',
         element: (
