@@ -8,6 +8,7 @@ fills in its engine against them (and may add fields, but should not rename thes
 
 from dataclasses import dataclass, field
 from datetime import date
+from decimal import Decimal
 
 # --------------------------------------------------------------------------------------
 # Inputs
@@ -154,7 +155,7 @@ class AssignmentPlan:
 
 
 # --------------------------------------------------------------------------------------
-# Results for Steps 07, 09 and 10; placeholder for 11 (field names fixed now)
+# Results for Steps 07, 09, 10 and 11
 # --------------------------------------------------------------------------------------
 
 
@@ -222,25 +223,37 @@ class ForecastResult:
 
 
 @dataclass(frozen=True, slots=True)
+class BaselineTask:
+    """A task's planned cost, spread evenly over its scheduled working days."""
+
+    task_id: int
+    start: date
+    end: date
+    budget: Decimal  # planned hours x hourly rate
+
+
+@dataclass(frozen=True, slots=True)
 class EVMPoint:
     on: date
-    pv: float  # hours of planned value (convert to money in the service)
-    ev: float
-    ac: float
+    pv: Decimal
+    ev: Decimal | None  # None on planned-only points (no snapshot that day)
+    ac: Decimal | None
 
 
 @dataclass(frozen=True, slots=True)
 class EVMResult:
-    bac: float
-    pv: float
-    ev: float
-    ac: float
-    sv: float  # ev - pv
-    cv: float  # ev - ac
-    spi: float  # ev / pv
-    cpi: float  # ev / ac
-    eac: float  # bac / cpi
-    etc: float  # eac - ac
-    vac: float  # bac - eac
-    tcpi: float  # (bac - ev) / (bac - ac)
-    series: tuple[EVMPoint, ...] = ()
+    """Earned value metrics. A ratio is None when its divisor is zero; `notes` says why."""
+
+    bac: Decimal  # budget at completion
+    pv: Decimal  # planned value
+    ev: Decimal  # earned value
+    ac: Decimal  # actual cost
+    sv: Decimal  # ev - pv
+    cv: Decimal  # ev - ac
+    spi: float | None  # ev / pv
+    cpi: float | None  # ev / ac
+    eac: Decimal | None  # bac / cpi
+    etc: Decimal | None  # eac - ac
+    vac: Decimal | None  # bac - eac
+    tcpi: float | None  # (bac - ev) / (bac - ac)
+    notes: dict[str, str] = field(default_factory=dict)  # metric -> reason it is None

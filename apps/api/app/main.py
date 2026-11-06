@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from app import __version__
 from app.config import Settings, get_settings
 from app.errors import register_exception_handlers
-from app.routers import assignment, cpm, estimate, forecast, schedule
+from app.routers import assignment, cpm, estimate, evm, forecast, schedule
 
 
 class HealthResponse(BaseModel):
@@ -34,6 +34,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(assignment.router)
     app.include_router(schedule.router)
     app.include_router(forecast.router)
+    app.include_router(evm.router)
 
     @app.get("/health", response_model=HealthResponse, tags=["meta"])
     def health() -> HealthResponse:
