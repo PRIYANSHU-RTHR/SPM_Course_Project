@@ -15,8 +15,8 @@ db-down:
 migrate:
 	cd $(API_DIR) && uv run alembic upgrade head
 
-seed:
-	@echo "seed: added in step 04"
+seed: migrate  ## wipes the database in DATABASE_URL and recreates the demo data
+	cd $(API_DIR) && uv run python -m app.seed
 
 demo:
 	@echo "demo: added in step 26"
