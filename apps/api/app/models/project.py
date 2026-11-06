@@ -42,10 +42,13 @@ class Project(TimestampMixin, Base):
     hourly_rate: Mapped[Decimal] = mapped_column(Numeric(10, 2))
 
     epics: Mapped[list["Epic"]] = relationship(
-        back_populates="project", cascade="all, delete-orphan", order_by="Epic.position"
+        back_populates="project",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        order_by="Epic.position",
     )
     tasks: Mapped[list["Task"]] = relationship(
-        back_populates="project", cascade="all, delete-orphan"
+        back_populates="project", cascade="all, delete-orphan", passive_deletes=True
     )
 
 
@@ -61,7 +64,10 @@ class Epic(TimestampMixin, Base):
     position: Mapped[int] = mapped_column(default=0, server_default=text("0"))
 
     project: Mapped[Project] = relationship(back_populates="epics")
-    tasks: Mapped[list["Task"]] = relationship(back_populates="epic")
+    # DB cascade (FK ON DELETE CASCADE) removes tasks; the ORM must not try to null epic_id.
+    tasks: Mapped[list["Task"]] = relationship(
+        back_populates="epic", cascade="all", passive_deletes=True
+    )
 
 
 class Task(TimestampMixin, Base):
@@ -101,7 +107,7 @@ class Task(TimestampMixin, Base):
     project: Mapped[Project] = relationship(back_populates="tasks")
     epic: Mapped[Epic] = relationship(back_populates="tasks")
     assignments: Mapped[list["Assignment"]] = relationship(
-        back_populates="task", cascade="all, delete-orphan"
+        back_populates="task", cascade="all, delete-orphan", passive_deletes=True
     )
 
 
