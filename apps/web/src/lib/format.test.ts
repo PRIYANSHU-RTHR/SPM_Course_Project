@@ -1,8 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
+  daysUntil,
   formatDate,
+  formatDaysLeft,
+  formatDelta,
   formatHours,
+  formatLakh,
   formatPercent,
+  formatProjectId,
+  formatRatio,
   formatRupees,
   formatShortDate,
   formatTaskId,
@@ -36,6 +42,35 @@ describe('format', () => {
   it('formats task ids', () => {
     expect(formatTaskId(14)).toBe('T-014')
     expect(formatTaskId(1234)).toBe('T-1234')
+  })
+
+  it('formats project ids and ratios', () => {
+    expect(formatProjectId(3)).toBe('P-003')
+    expect(formatRatio(0.9389)).toBe('0.94')
+    expect(formatRatio(null)).toBe('—')
+  })
+
+  it('formats signed deltas with a real minus sign', () => {
+    expect(formatDelta(0.014)).toBe('+0.01')
+    expect(formatDelta(-0.02)).toBe('−0.02')
+    expect(formatDelta(-0.001)).toBe('±0.00')
+    expect(formatDelta(null)).toBeUndefined()
+  })
+
+  it('counts calendar days left and phrases them', () => {
+    const today = new Date(2026, 10, 6, 15, 30)
+    expect(daysUntil('2026-12-01', today)).toBe(25)
+    expect(daysUntil('2026-11-06', today)).toBe(0)
+    expect(daysUntil('2026-11-03', today)).toBe(-3)
+    expect(formatDaysLeft(25)).toBe('25 days left')
+    expect(formatDaysLeft(1)).toBe('1 day left')
+    expect(formatDaysLeft(0)).toBe('Due today')
+    expect(formatDaysLeft(-3)).toBe('3 days overdue')
+  })
+
+  it('formats lakh for chart axes', () => {
+    expect(formatLakh(450000)).toBe('₹4.5L')
+    expect(formatLakh(300000)).toBe('₹3L')
   })
 
   it('builds initials', () => {

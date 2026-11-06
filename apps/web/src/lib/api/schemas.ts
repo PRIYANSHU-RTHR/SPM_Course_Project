@@ -1,0 +1,19 @@
+import type { components } from './types'
+
+type Schemas = components['schemas']
+
+export type Project = Schemas['ProjectRead']
+export type ProjectPage = Schemas['ProjectPage']
+export type ProjectFull = Schemas['ProjectFull']
+export type Task = Schemas['TaskRead']
+export type TaskStatus = Task['status']
+export type MemberPage = Schemas['MemberPage']
+export type Member = Schemas['MemberRead']
+export type ProjectForecast = Schemas['ProjectForecast']
+export type ProjectEvm = Schemas['ProjectEvm']
+export type ProjectCpm = Schemas['ProjectCpm']
+export type ProjectSchedule = Schemas['ProjectSchedule']
+export type WeekLoad = Schemas['WeekLoadOut']
+export type Risk = Schemas['RiskRead']
+export type RiskPage = Schemas['RiskPage']
+export type RiskRefreshResult = Schemas['RiskRefreshResult']

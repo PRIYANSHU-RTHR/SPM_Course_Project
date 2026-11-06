@@ -40,6 +40,7 @@ from app.models import (
     Task,
     TaskStatus,
 )
+from app.services.risk_service import refresh_risks
 
 CENTS = Decimal("0.01")
 HOURS_PER_DAY = 8.0  # one project day of effort, matching the engines' working calendar
@@ -436,6 +437,9 @@ def main() -> None:
     settings = get_settings()
     with get_session_factory()() as session:
         project = seed_demo(session, seed=settings.sim_seed)
+        session.commit()
+        # Risks exist only after detection runs, so the demo must not start at zero.
+        refresh_risks(session, project.id, as_of=datetime.now(UTC).date(), seed=settings.sim_seed)
         session.commit()
         print(
             f"Seeded {project.name}: {len(TASKS)} tasks, {len(MEMBERS)} members, "

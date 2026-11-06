@@ -12,9 +12,471 @@ export interface paths {
             cookie?: never;
         };
         /** Health */
-        get: operations["health_health_get"];
+        get: operations["meta_health"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List */
+        get: operations["projects_list"];
+        put?: never;
+        /** Create */
+        post: operations["projects_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["projects_get"];
+        put?: never;
+        post?: never;
+        /** Delete */
+        delete: operations["projects_delete"];
+        options?: never;
+        head?: never;
+        /** Update */
+        patch: operations["projects_update"];
+        trace?: never;
+    };
+    "/projects/{project_id}/full": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Full
+         * @description Project + epics + tasks + dependencies + current assignments in one call.
+         */
+        get: operations["projects_get_full"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/epics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List */
+        get: operations["epics_list"];
+        put?: never;
+        /** Create */
+        post: operations["epics_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/epics/{epic_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["epics_get"];
+        put?: never;
+        post?: never;
+        /** Delete */
+        delete: operations["epics_delete"];
+        options?: never;
+        head?: never;
+        /** Update */
+        patch: operations["epics_update"];
+        trace?: never;
+    };
+    "/projects/{project_id}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List */
+        get: operations["tasks_list"];
+        put?: never;
+        /** Create */
+        post: operations["tasks_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["tasks_get"];
+        put?: never;
+        post?: never;
+        /** Delete */
+        delete: operations["tasks_delete"];
+        options?: never;
+        head?: never;
+        /** Update */
+        patch: operations["tasks_update"];
+        trace?: never;
+    };
+    "/projects/{project_id}/dependencies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List */
+        get: operations["dependencies_list"];
+        put?: never;
+        /**
+         * Create
+         * @description 409 if it duplicates an edge or would close a cycle (`details.cycle` holds the task ids).
+         */
+        post: operations["dependencies_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dependencies/{dependency_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete */
+        delete: operations["dependencies_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List */
+        get: operations["members_list"];
+        put?: never;
+        /** Create */
+        post: operations["members_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/members/{member_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["members_get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete
+         * @description 409 when the member has assignment history.
+         */
+        delete: operations["members_delete"];
+        options?: never;
+        head?: never;
+        /** Update */
+        patch: operations["members_update"];
+        trace?: never;
+    };
+    "/members/{member_id}/skills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace Skills */
+        put: operations["members_replace_skills"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/members/{member_id}/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Availability */
+        post: operations["members_add_availability"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/members/{member_id}/availability/{availability_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Availability */
+        delete: operations["members_delete_availability"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/skills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List */
+        get: operations["skills_list"];
+        put?: never;
+        /** Create */
+        post: operations["skills_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/skills/{skill_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["skills_get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete
+         * @description 409 when tasks still require the skill.
+         */
+        delete: operations["skills_delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update
+         * @description 409 when renaming a skill that tasks still require by name.
+         */
+        patch: operations["skills_update"];
+        trace?: never;
+    };
+    "/projects/{project_id}/estimate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["estimation_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/cpm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Cpm */
+        get: operations["schedule_get_cpm"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/assignments/recommend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Recommend */
+        post: operations["assignment_recommend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/assignments/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply */
+        post: operations["assignment_apply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["schedule_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/forecast": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["forecast_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/evm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["evm_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/risks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List
+         * @description Risk register, highest score (probability x impact) first.
+         */
+        get: operations["risks_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/risks/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh
+         * @description Re-run every risk rule; opens, updates, reopens and closes register rows.
+         */
+        post: operations["risks_refresh"];
         delete?: never;
         options?: never;
         head?: never;
@@ -25,12 +487,1155 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AppliedAssignment */
+        AppliedAssignment: {
+            /** Assignment Id */
+            assignment_id: number;
+            /** Task Id */
+            task_id: number;
+            /** Member Id */
+            member_id: number;
+            /** Previous Member Id */
+            previous_member_id: number | null;
+            source: components["schemas"]["AssignmentSource"];
+        };
+        /** ApplyItem */
+        ApplyItem: {
+            /** Task Id */
+            task_id: number;
+            /** Member Id */
+            member_id: number;
+            /** @default ai */
+            source: components["schemas"]["AssignmentSource"];
+            /** Reason */
+            reason?: string | null;
+            /** Score Breakdown */
+            score_breakdown?: {
+                [key: string]: unknown;
+            };
+        };
+        /** ApplyRequest */
+        ApplyRequest: {
+            /** Actor */
+            actor: string;
+            /** Items */
+            items: components["schemas"]["ApplyItem"][];
+        };
+        /** AssignmentRead */
+        AssignmentRead: {
+            /** Id */
+            id: number;
+            /** Task Id */
+            task_id: number;
+            /** Member Id */
+            member_id: number;
+            /** Score Breakdown */
+            score_breakdown: {
+                [key: string]: unknown;
+            };
+            source: components["schemas"]["AssignmentSource"];
+            /** Reason */
+            reason: string | null;
+            /** Is Current */
+            is_current: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * AssignmentSource
+         * @enum {string}
+         */
+        AssignmentSource: "ai" | "pm_override";
+        /**
+         * AvailabilityCreate
+         * @description `work` needs hours_per_week; `leave` is always 0 h/week (may be omitted).
+         */
+        AvailabilityCreate: {
+            kind: components["schemas"]["AvailabilityKind"];
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            /** Hours Per Week */
+            hours_per_week?: number | null;
+            /** Note */
+            note?: string | null;
+        };
+        /**
+         * AvailabilityKind
+         * @enum {string}
+         */
+        AvailabilityKind: "work" | "leave";
+        /** AvailabilityRead */
+        AvailabilityRead: {
+            /** Id */
+            id: number;
+            kind: components["schemas"]["AvailabilityKind"];
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            /** Hours Per Week */
+            hours_per_week: number;
+            /** Note */
+            note: string | null;
+        };
+        /** CandidateOut */
+        CandidateOut: {
+            /** Member Id */
+            member_id: number;
+            score: components["schemas"]["ScoreOut"];
+        };
+        /** CdfPoint */
+        CdfPoint: {
+            /** Hours */
+            hours: number;
+            /** Probability */
+            probability: number;
+        };
+        /** Cocomo */
+        Cocomo: {
+            /**
+             * Loc Per Hour
+             * @description Productivity assumption used to size the project
+             */
+            loc_per_hour: number;
+            /** Ksloc */
+            ksloc: number;
+            /**
+             * Exponent
+             * @description E = B + 0.01 * sum(scale factors)
+             */
+            exponent: number;
+            /**
+             * Effort Pm
+             * @description Person-months
+             */
+            effort_pm: number;
+            /**
+             * Tdev Months
+             * @description Calendar months
+             */
+            tdev_months: number;
+            /** Avg Staff */
+            avg_staff: number;
+        };
+        /** Comparison */
+        Comparison: {
+            /** Greedy Total */
+            greedy_total: number;
+            /** Optimal Total */
+            optimal_total: number;
+            /** Greedy Utilisation Std */
+            greedy_utilisation_std: number;
+            /** Optimal Utilisation Std */
+            optimal_utilisation_std: number;
+            /** Greedy Unassigned */
+            greedy_unassigned: number;
+            /** Optimal Unassigned */
+            optimal_unassigned: number;
+        };
+        /** CpmTask */
+        CpmTask: {
+            /** Task Id */
+            task_id: number;
+            /**
+             * Duration Hours
+             * @description PERT te
+             */
+            duration_hours: number;
+            /**
+             * Es
+             * @description Earliest start
+             */
+            es: number;
+            /**
+             * Ef
+             * @description Earliest finish
+             */
+            ef: number;
+            /**
+             * Ls
+             * @description Latest start
+             */
+            ls: number;
+            /**
+             * Lf
+             * @description Latest finish
+             */
+            lf: number;
+            /**
+             * Total Slack
+             * @description LS - ES: delay possible without moving the end date
+             */
+            total_slack: number;
+            /**
+             * Free Slack
+             * @description Delay possible without moving any successor
+             */
+            free_slack: number;
+            /** Critical */
+            critical: boolean;
+        };
+        /**
+         * DependencyCreate
+         * @description `pred_task_id` must finish before `succ_task_id` starts (finish-to-start).
+         */
+        DependencyCreate: {
+            /** Pred Task Id */
+            pred_task_id: number;
+            /** Succ Task Id */
+            succ_task_id: number;
+        };
+        /** DependencyPage */
+        DependencyPage: {
+            /** Items */
+            items: components["schemas"]["DependencyRead"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** DependencyRead */
+        DependencyRead: {
+            /** Id */
+            id: number;
+            /** Pred Task Id */
+            pred_task_id: number;
+            /** Succ Task Id */
+            succ_task_id: number;
+            type: components["schemas"]["DependencyType"];
+        };
+        /**
+         * DependencyType
+         * @enum {string}
+         */
+        DependencyType: "FS";
+        /** EpicCreate */
+        EpicCreate: {
+            /** Title */
+            title: string;
+            /** Description */
+            description?: string | null;
+            /**
+             * Position
+             * @default 0
+             */
+            position: number;
+        };
+        /** EpicPage */
+        EpicPage: {
+            /** Items */
+            items: components["schemas"]["EpicRead"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** EpicRead */
+        EpicRead: {
+            /** Id */
+            id: number;
+            /** Project Id */
+            project_id: number;
+            /** Title */
+            title: string;
+            /** Description */
+            description: string | null;
+            /** Position */
+            position: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** EpicUpdate */
+        EpicUpdate: {
+            /** Title */
+            title?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Position */
+            position?: number | null;
+        };
+        /** ErrorBody */
+        ErrorBody: {
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * ErrorResponse
+         * @description Body of every DomainError response (see `app/errors.py`).
+         */
+        ErrorResponse: {
+            error: components["schemas"]["ErrorBody"];
+        };
+        /** EvmPointOut */
+        EvmPointOut: {
+            /**
+             * On
+             * Format: date
+             */
+            on: string;
+            /** Pv */
+            pv: string;
+            /**
+             * Ev
+             * @description null on planned-only points
+             */
+            ev: string | null;
+            /** Ac */
+            ac: string | null;
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
         /** HealthResponse */
         HealthResponse: {
             /** Status */
             status: string;
             /** Version */
             version: string;
+        };
+        /** HistogramBin */
+        HistogramBin: {
+            /** Start Hours */
+            start_hours: number;
+            /** Runs */
+            runs: number;
+        };
+        /** Ineligible */
+        Ineligible: {
+            /** Member Id */
+            member_id: number;
+            /** Reason */
+            reason: string;
+        };
+        /** MemberCreate */
+        MemberCreate: {
+            /** Name */
+            name: string;
+            /** Role */
+            role: string;
+            /** Email */
+            email?: string | null;
+            /** Skills */
+            skills?: components["schemas"]["MemberSkillIn"][];
+            /** Availability */
+            availability?: components["schemas"]["AvailabilityCreate"][];
+        };
+        /** MemberPage */
+        MemberPage: {
+            /** Items */
+            items: components["schemas"]["MemberRead"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** MemberRead */
+        MemberRead: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Role */
+            role: string;
+            /** Email */
+            email: string | null;
+            /** Skills */
+            skills: components["schemas"]["MemberSkillRead"][];
+            /** Availability */
+            availability: components["schemas"]["AvailabilityRead"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** MemberSkillIn */
+        MemberSkillIn: {
+            /** Skill Id */
+            skill_id: number;
+            /** Level */
+            level: number;
+        };
+        /** MemberSkillRead */
+        MemberSkillRead: {
+            /** Skill Id */
+            skill_id: number;
+            /**
+             * Skill
+             * @description Skill name
+             */
+            skill: string;
+            /** Level */
+            level: number;
+        };
+        /**
+         * MemberSkillsReplace
+         * @description Full replacement of a member's skill levels.
+         */
+        MemberSkillsReplace: {
+            /** Skills */
+            skills: components["schemas"]["MemberSkillIn"][];
+        };
+        /** MemberUpdate */
+        MemberUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Role */
+            role?: string | null;
+            /** Email */
+            email?: string | null;
+        };
+        /** Percentile */
+        Percentile: {
+            /** Hours */
+            hours: number;
+            /**
+             * On
+             * Format: date
+             * @description Working day on which that many hours are reached
+             */
+            on: string;
+        };
+        /** ProjectCpm */
+        ProjectCpm: {
+            /** Project Id */
+            project_id: number;
+            /** Project Duration Hours */
+            project_duration_hours: number;
+            /**
+             * Critical Paths
+             * @description Task ids, start to end, one per path
+             */
+            critical_paths: number[][];
+            /**
+             * Tasks
+             * @description In topological order
+             */
+            tasks: components["schemas"]["CpmTask"][];
+        };
+        /** ProjectCreate */
+        ProjectCreate: {
+            /** Name */
+            name: string;
+            /** Brief */
+            brief?: string | null;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * Deadline
+             * Format: date
+             */
+            deadline: string;
+            /** Budget */
+            budget: number | string;
+            /** Hourly Rate */
+            hourly_rate: number | string;
+        };
+        /** ProjectEstimate */
+        ProjectEstimate: {
+            /** Project Id */
+            project_id: number;
+            /** Task Count */
+            task_count: number;
+            /**
+             * Total Te Hours
+             * @description Bottom-up PERT effort: sum of task te
+             */
+            total_te_hours: number;
+            /**
+             * Total Std Hours
+             * @description sqrt of summed task variances (effort uncertainty, not schedule)
+             */
+            total_std_hours: number;
+            /**
+             * Total Effort Pm
+             * @description total_te_hours / 152
+             */
+            total_effort_pm: number;
+            /** Tasks */
+            tasks: components["schemas"]["TaskPert"][];
+            /** @description Top-down cross-check; null when no tasks */
+            cocomo: components["schemas"]["Cocomo"] | null;
+        };
+        /** ProjectEvm */
+        ProjectEvm: {
+            /** Project Id */
+            project_id: number;
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /**
+             * Budget
+             * @description Project budget as entered (for comparison with BAC)
+             */
+            budget: string;
+            /**
+             * Bac
+             * @description Sum of task budgets: PERT hours x hourly rate
+             */
+            bac: string;
+            /** Pv */
+            pv: string;
+            /** Ev */
+            ev: string;
+            /** Ac */
+            ac: string;
+            /** Sv */
+            sv: string;
+            /** Cv */
+            cv: string;
+            /** Spi */
+            spi: number | null;
+            /** Cpi */
+            cpi: number | null;
+            /** Eac */
+            eac: string | null;
+            /** Etc */
+            etc: string | null;
+            /** Vac */
+            vac: string | null;
+            /** Tcpi */
+            tcpi: number | null;
+            /**
+             * Notes
+             * @description Why a metric is null
+             */
+            notes: {
+                [key: string]: string;
+            };
+            /**
+             * Snapshots
+             * @description Recorded progress, PV from the baseline
+             */
+            snapshots: components["schemas"]["EvmPointOut"][];
+            /**
+             * Planned
+             * @description Weekly PV curve (Fridays) to the finish
+             */
+            planned: components["schemas"]["EvmPointOut"][];
+        };
+        /** ProjectForecast */
+        ProjectForecast: {
+            /** Project Id */
+            project_id: number;
+            /** Runs */
+            runs: number;
+            /** Seed */
+            seed: number;
+            /**
+             * Deadline
+             * Format: date
+             */
+            deadline: string;
+            /**
+             * Deadline Hours
+             * @description Working hours from start to deadline, 8 h/day
+             */
+            deadline_hours: number;
+            /**
+             * P On Time
+             * @description Share of runs finishing by the deadline
+             */
+            p_on_time: number;
+            /** Mean Hours */
+            mean_hours: number;
+            p50: components["schemas"]["Percentile"];
+            p80: components["schemas"]["Percentile"];
+            p95: components["schemas"]["Percentile"];
+            /** Histogram */
+            histogram: components["schemas"]["HistogramBin"][];
+            /** Cdf */
+            cdf: components["schemas"]["CdfPoint"][];
+            /**
+             * Criticality
+             * @description Task id -> share of runs on a longest path
+             */
+            criticality: {
+                [key: string]: number;
+            };
+        };
+        /**
+         * ProjectFull
+         * @description Whole plan in one call. Flat lists keyed by id; `assignments` holds current ones only.
+         */
+        ProjectFull: {
+            project: components["schemas"]["ProjectRead"];
+            /** Epics */
+            epics: components["schemas"]["EpicRead"][];
+            /** Tasks */
+            tasks: components["schemas"]["TaskRead"][];
+            /** Dependencies */
+            dependencies: components["schemas"]["DependencyRead"][];
+            /** Assignments */
+            assignments: components["schemas"]["AssignmentRead"][];
+        };
+        /** ProjectPage */
+        ProjectPage: {
+            /** Items */
+            items: components["schemas"]["ProjectRead"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** ProjectRead */
+        ProjectRead: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Brief */
+            brief: string | null;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * Deadline
+             * Format: date
+             */
+            deadline: string;
+            /** Budget */
+            budget: string;
+            /** Hourly Rate */
+            hourly_rate: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ProjectSchedule */
+        ProjectSchedule: {
+            /** Project Id */
+            project_id: number;
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+            /**
+             * Finish
+             * Format: date
+             */
+            finish: string;
+            /**
+             * Deadline
+             * Format: date
+             */
+            deadline: string;
+            /** Tasks */
+            tasks: components["schemas"]["ScheduledTaskOut"][];
+            /** Loads */
+            loads: components["schemas"]["WeekLoadOut"][];
+            /**
+             * Delayed
+             * @description Task ids pushed back by resource limits
+             */
+            delayed: number[];
+        };
+        /** ProjectUpdate */
+        ProjectUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Brief */
+            brief?: string | null;
+            /** Start Date */
+            start_date?: string | null;
+            /** Deadline */
+            deadline?: string | null;
+            /** Budget */
+            budget?: number | string | null;
+            /** Hourly Rate */
+            hourly_rate?: number | string | null;
+        };
+        /** RecommendResponse */
+        RecommendResponse: {
+            /** Project Id */
+            project_id: number;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "greedy" | "optimal";
+            /** Total Score */
+            total_score: number;
+            /** Utilisation Std */
+            utilisation_std: number;
+            /** Unassigned */
+            unassigned: number;
+            /** Utilisation */
+            utilisation: {
+                [key: string]: number | null;
+            };
+            /** Recommendations */
+            recommendations: components["schemas"]["RecommendationOut"][];
+            comparison: components["schemas"]["Comparison"];
+        };
+        /** RecommendationOut */
+        RecommendationOut: {
+            /** Task Id */
+            task_id: number;
+            /**
+             * Window Start
+             * Format: date
+             */
+            window_start: string;
+            /**
+             * Window End
+             * Format: date
+             */
+            window_end: string;
+            /** Member Id */
+            member_id: number | null;
+            score: components["schemas"]["ScoreOut"] | null;
+            /**
+             * Candidates
+             * @description Top 3 eligible, best first
+             */
+            candidates: components["schemas"]["CandidateOut"][];
+            /** Ineligible */
+            ineligible: components["schemas"]["Ineligible"][];
+        };
+        /** RequiredSkill */
+        RequiredSkill: {
+            /**
+             * Skill
+             * @description Skill name from /skills
+             */
+            skill: string;
+            /** Level */
+            level: number;
+            /**
+             * Must
+             * @default true
+             */
+            must: boolean;
+        };
+        /**
+         * RiskCategory
+         * @enum {string}
+         */
+        RiskCategory: "schedule" | "resource" | "cost" | "skill" | "technical";
+        /** RiskPage */
+        RiskPage: {
+            /** Items */
+            items: components["schemas"]["RiskRead"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** RiskRead */
+        RiskRead: {
+            /** Id */
+            id: number;
+            /** Project Id */
+            project_id: number;
+            /** Rule Key */
+            rule_key: string;
+            /**
+             * Subject Ref
+             * @description "project", "task:<id>" or "member:<id>"
+             */
+            subject_ref: string;
+            /** Title */
+            title: string;
+            /** Description */
+            description: string | null;
+            category: components["schemas"]["RiskCategory"];
+            /** Probability */
+            probability: number;
+            /** Impact */
+            impact: number;
+            status: components["schemas"]["RiskStatus"];
+            /**
+             * Evidence
+             * @description Numbers that made the rule fire
+             */
+            evidence: {
+                [key: string]: unknown;
+            };
+            /** Rmmm */
+            rmmm: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Score
+             * @description Probability x impact, 1-25.
+             */
+            readonly score: number;
+        };
+        /** RiskRefreshResult */
+        RiskRefreshResult: {
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /**
+             * Opened
+             * @description Risk ids raised for the first time
+             */
+            opened: number[];
+            /**
+             * Reopened
+             * @description Closed risks whose rule fires again
+             */
+            reopened: number[];
+            /**
+             * Updated
+             * @description Still-firing risks whose P, I, title or evidence changed
+             */
+            updated: number[];
+            /**
+             * Closed
+             * @description Risks whose rule no longer fires
+             */
+            closed: number[];
+            /**
+             * Open Total
+             * @description Risks not closed after the refresh
+             */
+            open_total: number;
+        };
+        /**
+         * RiskStatus
+         * @enum {string}
+         */
+        RiskStatus: "open" | "mitigating" | "closed";
+        /** ScheduledTaskOut */
+        ScheduledTaskOut: {
+            /** Task Id */
+            task_id: number;
+            /** Member Id */
+            member_id: number | null;
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+            /**
+             * End
+             * Format: date
+             */
+            end: string;
+            /** Hours */
+            hours: number;
+            /**
+             * Early Start
+             * Format: date
+             * @description CPM early start, ignoring resources
+             */
+            early_start: string;
+            /**
+             * Resource Delay Days
+             * @description Working days later than early_start
+             */
+            resource_delay_days: number;
+        };
+        /** ScoreOut */
+        ScoreOut: {
+            /**
+             * Total
+             * @description 0-100
+             */
+            total: number;
+            /** Skill Fit */
+            skill_fit: number;
+            /** Capacity Fit */
+            capacity_fit: number;
+            /** Balance */
+            balance: number;
+            /**
+             * Skill Part
+             * @description Points from skill_fit (weights x 100)
+             */
+            skill_part: number;
+            /** Capacity Part */
+            capacity_part: number;
+            /** Balance Part */
+            balance_part: number;
+            /** Free Hours */
+            free_hours: number;
+            /**
+             * Utilisation
+             * @description null = member has work but zero capacity
+             */
+            utilisation: number | null;
+            /** Skills */
+            skills: components["schemas"]["SkillMatchOut"][];
+        };
+        /** SkillCreate */
+        SkillCreate: {
+            /**
+             * Name
+             * @description Stored lowercase, e.g. `react`
+             */
+            name: string;
+        };
+        /** SkillMatchOut */
+        SkillMatchOut: {
+            /** Skill */
+            skill: string;
+            /** Required */
+            required: number;
+            /** Has */
+            has: number;
+            /** Weight */
+            weight: number;
+            /** Fit */
+            fit: number;
+        };
+        /** SkillPage */
+        SkillPage: {
+            /** Items */
+            items: components["schemas"]["SkillRead"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** SkillRead */
+        SkillRead: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** SkillUpdate */
+        SkillUpdate: {
+            /** Name */
+            name?: string | null;
+        };
+        /** TaskCreate */
+        TaskCreate: {
+            /** Epic Id */
+            epic_id: number;
+            /** Title */
+            title: string;
+            /** Description */
+            description?: string | null;
+            /** Optimistic Hours */
+            optimistic_hours: number;
+            /** Most Likely Hours */
+            most_likely_hours: number;
+            /** Pessimistic Hours */
+            pessimistic_hours: number;
+            /**
+             * Priority
+             * @default 3
+             */
+            priority: number;
+            /** Required Skills */
+            required_skills?: components["schemas"]["RequiredSkill"][];
+        };
+        /** TaskPage */
+        TaskPage: {
+            /** Items */
+            items: components["schemas"]["TaskRead"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** TaskPert */
+        TaskPert: {
+            /** Task Id */
+            task_id: number;
+            /**
+             * Te Hours
+             * @description Expected hours, (o + 4m + p) / 6
+             */
+            te_hours: number;
+            /**
+             * Variance
+             * @description ((p - o) / 6)^2, hours^2
+             */
+            variance: number;
+            /** Std Hours */
+            std_hours: number;
+        };
+        /** TaskRead */
+        TaskRead: {
+            /** Id */
+            id: number;
+            /** Project Id */
+            project_id: number;
+            /** Epic Id */
+            epic_id: number;
+            /** Title */
+            title: string;
+            /** Description */
+            description: string | null;
+            /** Optimistic Hours */
+            optimistic_hours: number;
+            /** Most Likely Hours */
+            most_likely_hours: number;
+            /** Pessimistic Hours */
+            pessimistic_hours: number;
+            /** Priority */
+            priority: number;
+            status: components["schemas"]["TaskStatus"];
+            /** Required Skills */
+            required_skills: components["schemas"]["RequiredSkill"][];
+            /** Percent Complete */
+            percent_complete: number;
+            /** Actual Hours */
+            actual_hours: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * TaskStatus
+         * @enum {string}
+         */
+        TaskStatus: "todo" | "in_progress" | "blocked" | "done";
+        /**
+         * TaskUpdate
+         * @description o/m/p order is re-checked against the stored values in the service.
+         */
+        TaskUpdate: {
+            /** Epic Id */
+            epic_id?: number | null;
+            /** Title */
+            title?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Optimistic Hours */
+            optimistic_hours?: number | null;
+            /** Most Likely Hours */
+            most_likely_hours?: number | null;
+            /** Pessimistic Hours */
+            pessimistic_hours?: number | null;
+            /** Priority */
+            priority?: number | null;
+            status?: components["schemas"]["TaskStatus"] | null;
+            /** Required Skills */
+            required_skills?: components["schemas"]["RequiredSkill"][] | null;
+            /** Percent Complete */
+            percent_complete?: number | null;
+            /** Actual Hours */
+            actual_hours?: number | null;
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
+        };
+        /** WeekLoadOut */
+        WeekLoadOut: {
+            /** Member Id */
+            member_id: number;
+            /**
+             * Week Start
+             * Format: date
+             * @description Monday of the ISO week
+             */
+            week_start: string;
+            /** Hours */
+            hours: number;
+            /** Capacity */
+            capacity: number;
+            /**
+             * Utilisation
+             * @description hours / capacity; 0 when capacity is 0
+             */
+            utilisation: number;
         };
     };
     responses: never;
@@ -41,7 +1646,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    health_health_get: {
+    meta_health: {
         parameters: {
             query?: never;
             header?: never;
@@ -57,6 +1662,1681 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    projects_list: {
+        parameters: {
+            query?: {
+                /** @description Page size */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    projects_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProjectCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    projects_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    projects_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    projects_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProjectUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    projects_get_full: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectFull"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    epics_list: {
+        parameters: {
+            query?: {
+                /** @description Page size */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpicPage"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    epics_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EpicCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpicRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    epics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                epic_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpicRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    epics_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                epic_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    epics_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                epic_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EpicUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpicRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tasks_list: {
+        parameters: {
+            query?: {
+                /** @description Only tasks in this epic */
+                epic_id?: number | null;
+                /** @description Page size */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskPage"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tasks_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tasks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tasks_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tasks_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dependencies_list: {
+        parameters: {
+            query?: {
+                /** @description Page size */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DependencyPage"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dependencies_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DependencyCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DependencyRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dependencies_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dependency_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    members_list: {
+        parameters: {
+            query?: {
+                /** @description Page size */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    members_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberRead"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    members_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    members_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    members_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    members_replace_skills: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberSkillsReplace"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    members_add_availability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AvailabilityCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    members_delete_availability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: number;
+                availability_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    skills_list: {
+        parameters: {
+            query?: {
+                /** @description Page size */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    skills_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SkillCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillRead"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    skills_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                skill_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    skills_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                skill_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    skills_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                skill_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SkillUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    estimation_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectEstimate"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    schedule_get_cpm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectCpm"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assignment_recommend: {
+        parameters: {
+            query?: {
+                mode?: "greedy" | "optimal";
+            };
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecommendResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assignment_apply: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApplyRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppliedAssignment"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    schedule_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectSchedule"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    forecast_get: {
+        parameters: {
+            query?: {
+                n?: number;
+            };
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectForecast"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evm_get: {
+        parameters: {
+            query?: {
+                /** @description Status date (default: today, UTC) */
+                as_of?: string | null;
+            };
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectEvm"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    risks_list: {
+        parameters: {
+            query?: {
+                /** @description Also return closed risks */
+                include_closed?: boolean;
+                /** @description Page size */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskPage"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    risks_refresh: {
+        parameters: {
+            query?: {
+                /** @description Status date (default: today, UTC) */
+                as_of?: string | null;
+            };
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskRefreshResult"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

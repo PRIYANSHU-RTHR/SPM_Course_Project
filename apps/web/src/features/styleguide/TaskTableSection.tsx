@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge'
+import { TaskStatusBadge } from '@/components/TaskStatusBadge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -10,18 +10,9 @@ import {
 } from '@/components/ui/table'
 import { useProjectFull } from '@/features/projects/queries'
 import { useCurrentProject } from '@/features/projects/useCurrentProject'
-import type { Task, TaskStatus } from '@/lib/api/provisional'
+import type { Task } from '@/lib/api/schemas'
 import { formatHours, formatTaskId } from '@/lib/format'
 import { Section } from './Section'
-
-type StatusStyle = { label: string; variant: 'outline' | 'secondary' | 'success' | 'warning' }
-
-const STATUS: Record<TaskStatus, StatusStyle> = {
-  todo: { label: 'Todo', variant: 'outline' },
-  in_progress: { label: 'In progress', variant: 'secondary' },
-  blocked: { label: 'Blocked', variant: 'warning' },
-  done: { label: 'Done', variant: 'success' },
-}
 
 /** PERT expected hours, for display here only. The estimation engine owns this in the app. */
 function expectedHours(task: Task) {
@@ -67,7 +58,7 @@ export function TaskTableSection() {
                   </TableCell>
                   <TableCell>{task.title}</TableCell>
                   <TableCell>
-                    <Badge variant={STATUS[task.status].variant}>{STATUS[task.status].label}</Badge>
+                    <TaskStatusBadge status={task.status} />
                   </TableCell>
                   <TableCell className="numeric text-right">
                     {formatHours(expectedHours(task))}

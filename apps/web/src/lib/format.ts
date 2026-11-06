@@ -66,6 +66,45 @@ export function formatTaskId(id: Maybe<number>): string {
   return `T-${String(id).padStart(3, '0')}`
 }
 
+/** 3 → "P-003". */
+export function formatProjectId(id: Maybe<number>): string {
+  if (isMissing(id)) return EMPTY
+  return `P-${String(id).padStart(3, '0')}`
+}
+
+/** A plain ratio such as SPI: 0.9389 → "0.94". */
+export function formatRatio(value: Maybe<number>, digits = 2): string {
+  if (isMissing(value)) return EMPTY
+  return value.toFixed(digits)
+}
+
+/** A signed change with a real minus sign: -0.02 → "−0.02". Hides rounding to zero. */
+export function formatDelta(value: Maybe<number>, digits = 2): string | undefined {
+  if (isMissing(value)) return undefined
+  const rounded = value.toFixed(digits)
+  if (Number(rounded) === 0) return `±${Math.abs(Number(rounded)).toFixed(digits)}`
+  return value > 0 ? `+${rounded}` : `−${rounded.slice(1)}`
+}
+
+/** Calendar days from `today` to `value`; negative once the date has passed. */
+export function daysUntil(value: string, today = new Date()): number {
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  return Math.round((parseDate(value).getTime() - start.getTime()) / 86_400_000)
+}
+
+/** "25 days left", "Due today" or "3 days overdue". */
+export function formatDaysLeft(days: number): string {
+  if (days === 0) return 'Due today'
+  const count = Math.abs(days)
+  const unit = count === 1 ? 'day' : 'days'
+  return days > 0 ? `${count} ${unit} left` : `${count} ${unit} overdue`
+}
+
+/** Compact axis label in lakh: 450000 → "₹4.5L". */
+export function formatLakh(amount: number): string {
+  return `₹${Number((amount / 100_000).toFixed(1))}L`
+}
+
 /** "Meera Iyer" → "MI". */
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean)
