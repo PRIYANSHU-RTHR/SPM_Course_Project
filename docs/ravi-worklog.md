@@ -14,8 +14,8 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 | 04 | Seed data | Merged | Nothing |
 | 19 | Projects list and overview | Done, in [PR #5](https://github.com/PRIYANSHU-RTHR/SPM_Course_Project/pull/5), not merged | PR review by a teammate |
 | 21 | Network graph and Gantt | Done, on `feat/21-network-gantt`, no PR yet | PR after PR #5 merges |
-| 23 | Risk, EVM and forecast views | Ready after 19 | AI plans need Step 16 merged |
-| 22 | Team and assignment views | Ready after 19 | AI explanations need Step 16 merged |
+| 23 | Risk, EVM and forecast views | Done, on `feat/23-risk-evm-forecast`, no PR yet | PR after Step 21 merges. Generate plan needs Step 16 |
+| 22 | Team and assignment views | Next | AI explanations need Step 16 merged |
 | 20 | New project flow | Not started | Mock stream until Step 15 exists |
 | 24 (UI) | Disruption simulator, approvals, audit | Blocked | 17 and Priyanshu's Step 24 API work merged |
 | 27 | Docs, polish, deploy | Blocked | 26 merged |
@@ -32,7 +32,8 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 1. Get PR #5 (Step 19) reviewed and merged.
 2. Raise the open questions below. The forecast one blocks the demo story.
 3. Open the Step 21 PR once Step 19 is on `main`.
-4. Start Step 23 next. Its real data is ready, apart from the AI plans in Step 16.
+4. Open the Step 23 PR once Step 21 is on `main`.
+5. Start Step 22 next. Its real data is ready, apart from the AI explanations in Step 16.
 
 ## Work done
 
@@ -124,18 +125,37 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 - The network opens at a readable zoom instead of fitting everything.
 - Added a deadline line, which the brief did not ask for, so the overrun is visible.
 
+### Step 23 · Risk, EVM and forecast views (2026-11-06)
+
+**Built**
+
+- `/projects/:id/risks`: P×I matrix with click-to-filter, risk register, and a detail sheet with evidence and the RMMM plan.
+- `/projects/:id/control`: 8 EVM KPIs, S-curve, P(on time), finish-date histogram, CDF with P50, P80 and P95, and the top tasks by criticality.
+- Control is now in the left rail and the ⌘K palette.
+
+**Checked**
+
+- Typecheck, lint, tests and build pass.
+- Tested on real data at 1440px and 390px, including an empty project and a missing project.
+- The plan display was tested with one faked response, because the endpoint is not on `main`. The mock handler itself has not run.
+
+**Decisions**
+
+- Generate plan is built to the Step 16 format. On the real API it shows a clear message until Step 16 merges.
+- Owner role comes from the RMMM plan, so it is empty until a plan exists.
+
 ## Future requirements
 
 ### For my next steps
 
 - **After Step 17:** retune the seed so "Bob on leave" lands near the plan.md §4 numbers: 47%, then about 74% after approval.
-- **Step 23:** add `/projects/:id/control` and decide where it sits in the left rail.
+- **After Step 16 merges:** run `pnpm gen:api`, test Generate plan, and delete its mock handler.
 - **Step 27:** add the `g p` and `?` shortcuts, and fix the 543 kB main JS chunk with route-level code splitting.
 - **After API changes:** run `pnpm gen:api` and fix any type errors.
 
 ### Questions for the team
 
-- [ ] **Priyanshu, Manveer:** agree one `risk.rmmm` format before Step 23. The Step 03 model says `mitigation, monitoring, management`; the Step 16 prompt says `mitigation, monitoring_trigger, contingency, owner_role`.
+- [ ] **Manveer:** merge Step 16, then Generate plan can be tested on the real API. The `rmmm` format is settled by that branch.
 - [ ] **Team:** should projects have an owner? The Step 19 brief lists an owner column, but the project table has no such field.
 - [ ] **Priyanshu:** `ruff check` fails at `app/agents/llm.py:12` (line too long), which will fail CI in Step 25.
 - [ ] **Manveer, Priyanshu:** `forecast()` reads only tasks, so it ignores members, leave and progress. "Bob on leave" cannot drop P(on time) from 81% to 47% until Step 17 feeds leave into it.
