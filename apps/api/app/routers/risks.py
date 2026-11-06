@@ -3,9 +3,11 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query, Request
 
+from app.agents.llm import LLMClient
 from app.routers.deps import PageDep, SessionDep
 from app.schemas.common import CONFLICT, NOT_FOUND
 from app.schemas.risk import RiskPage, RiskRead, RiskRefreshResult
+from app.services import agents
 from app.services import risk_service as service
 
 router = APIRouter(prefix="/projects", tags=["risks"])
@@ -47,3 +49,12 @@ def refresh_risks(
         as_of or datetime.now(UTC).date(),
         request.app.state.settings.sim_seed,
     )
+
+
+@router.post(
+    "/{project_id}/risks/{risk_id}/plan", name="plan", response_model=RiskRead, responses=NOT_FOUND
+)
+def plan_risk(request: Request, session: SessionDep, project_id: int, risk_id: int) -> RiskRead:
+    """Generate and store the RMMM plan (mitigation, monitoring trigger, contingency, owner)."""
+    client = LLMClient(request.app.state.settings)
+    return RiskRead.model_validate(agents.plan_risk_rmmm(session, client, project_id, risk_id))

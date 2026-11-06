@@ -9,7 +9,7 @@ The fixture key hashes the prompt name, the rendered prompt and the schema's JSO
 not the model id. Switching `GEMINI_MODEL` keeps replaying old recordings. Changing a prompt
 or schema needs a re-record.
 
-The LLM only returns structure and prose. It never computes KPI numbers (see the project guidelines).
+The LLM only returns structure and prose. It never computes KPI numbers.
 """
 
 from __future__ import annotations
