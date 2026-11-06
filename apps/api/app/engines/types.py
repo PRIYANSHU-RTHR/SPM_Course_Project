@@ -154,7 +154,7 @@ class AssignmentPlan:
 
 
 # --------------------------------------------------------------------------------------
-# Results for Steps 07 and 09; placeholders for 10-11 (field names fixed now)
+# Results for Steps 07, 09 and 10; placeholder for 11 (field names fixed now)
 # --------------------------------------------------------------------------------------
 
 
@@ -210,12 +210,14 @@ class ScheduleResult:
 class ForecastResult:
     runs: int
     seed: int
-    p_on_time: float  # P(finish <= deadline)
-    p50: float  # hours from project start
+    deadline_hours: float | None  # working hours from project start to the deadline
+    p_on_time: float | None  # share of runs finishing <= deadline_hours (None without one)
+    mean: float  # hours from project start
+    p50: float
     p80: float
     p95: float
-    histogram: tuple[tuple[float, int], ...]  # (bin start hours, count)
-    cdf: tuple[tuple[float, float], ...]  # (hours, cumulative probability)
+    histogram: tuple[tuple[float, int], ...]  # (bin start hours, runs in bin), 30 bins
+    cdf: tuple[tuple[float, float], ...]  # (hours, share of runs finished by then), 50 points
     criticality: dict[int, float] = field(default_factory=dict)  # task id -> share of runs critical
 
 
