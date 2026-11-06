@@ -5,6 +5,7 @@ import {
   dateAfterHours,
   daysBetween,
   isMonday,
+  isoWeek,
   isWeekend,
   slackDays,
   todayIso,
@@ -42,6 +43,13 @@ describe('dates', () => {
     expect(dateAfterHours('2026-11-02', 8.5)).toBe('2026-11-03')
     expect(dateAfterHours('2026-11-02', 48)).toBe('2026-11-09')
     expect(dateAfterHours('2026-11-02', 0)).toBe('2026-11-02')
+  })
+
+  it('numbers ISO weeks, including across a year end', () => {
+    expect(isoWeek('2026-11-02')).toBe(45)
+    expect(isoWeek('2026-01-01')).toBe(1)
+    expect(isoWeek('2024-12-30')).toBe(1)
+    expect(isoWeek('2027-01-03')).toBe(53)
   })
 
   it('rounds slack up to whole days', () => {

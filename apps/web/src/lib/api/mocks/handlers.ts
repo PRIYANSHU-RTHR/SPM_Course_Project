@@ -4,9 +4,17 @@ import type { RiskPage } from '../schemas'
 
 /**
  * Mocks for endpoints the API does not have yet. Step 20 adds the workflow stream here.
- * Remove the plan handler once Step 16 is merged.
+ * Remove the plan and explain handlers once Step 16 is merged.
  */
 export const handlers: RequestHandler[] = [
+  http.get(`${API_URL}/projects/:projectId/assignments/:taskId/explain`, () =>
+    HttpResponse.json({
+      recommended_member_id: null,
+      text: 'This member has the best mix of skill fit and free capacity for the task window.',
+      grounded: true,
+      source: 'template',
+    }),
+  ),
   http.post(`${API_URL}/projects/:projectId/risks/:riskId/plan`, async ({ params }) => {
     const list = `${API_URL}/projects/${String(params.projectId)}/risks?limit=200`
     const response = await fetch(bypass(list))

@@ -1,6 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from '@/lib/api/client'
 import type {
+  AppliedAssignment,
+  ApplyRequest,
+  Explanation,
   MemberPage,
   ProjectCpm,
   ProjectEvm,
@@ -8,6 +11,7 @@ import type {
   ProjectFull,
   ProjectPage,
   ProjectSchedule,
+  RecommendResponse,
   Risk,
   RiskPage,
   RiskRefreshResult,
@@ -45,6 +49,43 @@ export const useSchedule = (id: number | undefined) =>
   useProjectResource<ProjectSchedule>(id, 'schedule')
 export const useRisks = (id: number | undefined) =>
   useProjectResource<RiskPage>(id, 'risks?limit=200')
+
+export type AssignmentMode = 'greedy' | 'optimal'
+
+export function useRecommendations(projectId: number | undefined, mode: AssignmentMode) {
+  return useQuery({
+    queryKey: ['projects', projectId, 'recommend', mode],
+    queryFn: ({ signal }) =>
+      apiFetch<RecommendResponse>(`/projects/${projectId}/assignments/recommend?mode=${mode}`, {
+        method: 'POST',
+        signal,
+      }),
+    enabled: projectId !== undefined,
+  })
+}
+
+export function useExplanation(projectId: number, taskId: number, mode: AssignmentMode) {
+  return useQuery({
+    queryKey: ['projects', projectId, 'explain', taskId, mode],
+    queryFn: ({ signal }) =>
+      apiFetch<Explanation>(`/projects/${projectId}/assignments/${taskId}/explain?mode=${mode}`, {
+        signal,
+      }),
+    retry: false,
+  })
+}
+
+export function useApplyAssignment(projectId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (body: ApplyRequest) =>
+      apiFetch<AppliedAssignment[]>(`/projects/${projectId}/assignments/apply`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects', projectId] }),
+  })
+}
 
 export function useGenerateRiskPlan(projectId: number) {
   const queryClient = useQueryClient()

@@ -6,6 +6,7 @@ import { ProjectsPage } from '@/features/projects/ProjectsPage'
 import { RisksPage } from '@/features/risks/RisksPage'
 import { SchedulePage } from '@/features/schedule/SchedulePage'
 import { StyleguidePage } from '@/features/styleguide/StyleguidePage'
+import { TeamPage } from '@/features/team/TeamPage'
 import { ErrorPage } from './pages/ErrorPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
@@ -19,17 +20,7 @@ export const router = createBrowserRouter([
       { path: 'projects', element: <ProjectsPage /> },
       { path: 'projects/:projectId', element: <OverviewPage /> },
       { path: 'projects/:projectId/schedule', element: <SchedulePage /> },
-      {
-        path: 'projects/:projectId/team',
-        element: (
-          <PlaceholderPage
-            label="Team"
-            title="Team and assignments"
-            step={22}
-            body="Skills matrix, capacity heatmap and explainable assignment review."
-          />
-        ),
-      },
+      { path: 'projects/:projectId/team', element: <TeamPage /> },
       { path: 'projects/:projectId/risks', element: <RisksPage /> },
       { path: 'projects/:projectId/control', element: <ControlPage /> },
       {
