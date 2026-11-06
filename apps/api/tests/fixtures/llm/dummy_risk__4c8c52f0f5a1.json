@@ -1,0 +1,18 @@
+{
+  "prompt_name": "dummy_risk",
+  "model": "hand-written-test-fixture",
+  "prompt_hash": "4c8c52f0f5a1bb714bde5326a9bd3a7c4b3a00bf9d5f0b58525179686a132407",
+  "recorded_at": "2026-11-06T00:00:00+00:00",
+  "usage": {
+    "input_tokens": 42,
+    "output_tokens": 17,
+    "thought_tokens": 0
+  },
+  "response_json": {
+    "label": "high",
+    "reasons": [
+      "Critical path task",
+      "Single owner with UPI experience"
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+You are reviewing one task of a software project.
+
+Task: $task
+Reply with JSON only: {"label": "low" | "high", "reasons": [string, ...]}.
