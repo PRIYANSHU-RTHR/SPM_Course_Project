@@ -17,6 +17,7 @@ from app.db import get_session
 from app.main import create_app
 from app.models import Base
 from tests import pg
+from tests.routers.helpers import Client
 
 
 @pytest.fixture(scope="session")
@@ -49,6 +50,12 @@ def client(session_factory: sessionmaker[Session]) -> TestClient:
 
     app.dependency_overrides[get_session] = override
     return TestClient(app)
+
+
+@pytest.fixture
+def api(client: TestClient, session_factory: sessionmaker[Session]) -> Client:
+    """(client, session factory) pair used by the engine endpoint tests (Steps 06-11)."""
+    return client, session_factory
 
 
 @pytest.fixture

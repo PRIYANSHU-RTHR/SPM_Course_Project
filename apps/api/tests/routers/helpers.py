@@ -1,8 +1,19 @@
-"""Small factories that create rows through the API and return the JSON body."""
+"""Small factories for router tests.
 
+`create_*` go through the API and return the JSON body; `make_project` adds ORM rows
+directly (used by the engine endpoint tests).
+"""
+
+from datetime import date
+from decimal import Decimal
 from typing import Any
 
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session, sessionmaker
+
+from app.models import Epic, Project
+
+Client = tuple[TestClient, sessionmaker[Session]]
 
 Json = dict[str, Any]
 
@@ -51,3 +62,16 @@ def create_task(
 def create_member(client: TestClient, name: str = "Aditi Sharma", **overrides: Any) -> Json:
     body = {"name": name, "role": "Backend Engineer", **overrides}
     return _ok(client.post("/members", json=body))
+
+
+def make_project(s: Session) -> tuple[Project, Epic]:
+    project = Project(
+        name="Campus Food-Ordering App",
+        start_date=date(2026, 11, 2),
+        deadline=date(2026, 12, 18),
+        budget=Decimal("500000.00"),
+        hourly_rate=Decimal("800.00"),
+    )
+    epic = Epic(project=project, title="Ordering")
+    s.add(project)
+    return project, epic

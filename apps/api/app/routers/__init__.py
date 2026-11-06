@@ -2,7 +2,20 @@
 
 from fastapi import APIRouter
 
-from app.routers import dependencies, epics, members, projects, skills, tasks
+from app.routers import (
+    assignment,
+    cpm,
+    dependencies,
+    epics,
+    estimate,
+    evm,
+    forecast,
+    members,
+    projects,
+    schedule,
+    skills,
+    tasks,
+)
 
 ROUTERS: tuple[APIRouter, ...] = (
     projects.router,
@@ -11,4 +24,10 @@ ROUTERS: tuple[APIRouter, ...] = (
     dependencies.router,
     members.router,
     skills.router,
+    estimate.router,
+    cpm.router,
+    assignment.router,
+    schedule.router,
+    forecast.router,
+    evm.router,
 )
