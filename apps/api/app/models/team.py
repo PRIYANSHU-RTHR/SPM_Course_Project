@@ -27,7 +27,10 @@ class Member(TimestampMixin, Base):
     availability: Mapped[list["Availability"]] = relationship(
         back_populates="member", cascade="all, delete-orphan"
     )
-    assignments: Mapped[list["Assignment"]] = relationship(back_populates="member")
+    # passive_deletes="all": never null member_id; the FK (ON DELETE RESTRICT) decides.
+    assignments: Mapped[list["Assignment"]] = relationship(
+        back_populates="member", passive_deletes="all"
+    )
 
 
 class Skill(Base):

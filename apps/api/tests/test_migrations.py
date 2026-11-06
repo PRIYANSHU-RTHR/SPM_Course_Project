@@ -5,22 +5,18 @@ DATABASE_URL and dropped afterwards, so dev/seed data is never touched. The whol
 skipped when Postgres is not reachable.
 """
 
-import uuid
 from collections.abc import Iterator
 from datetime import date
 from decimal import Decimal
-from pathlib import Path
 
 import pytest
 from alembic import command
 from alembic.autogenerate import compare_metadata
-from alembic.config import Config
 from alembic.migration import MigrationContext
-from sqlalchemy import URL, create_engine, inspect, make_url, text
-from sqlalchemy.exc import IntegrityError, OperationalError
+from sqlalchemy import URL, create_engine, inspect, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.config import Settings
 from app.models import (
     Assignment,
     AssignmentSource,
@@ -33,8 +29,8 @@ from app.models import (
     RiskCategory,
     Task,
 )
+from tests import pg
 
-API_DIR = Path(__file__).resolve().parents[1]
 EXPECTED_TABLES = {
     "alembic_version",
     "assignment",
@@ -60,58 +56,20 @@ EXPECTED_ENUMS = {
 }
 
 
-def _server_url() -> URL:
-    return make_url(Settings().database_url)
-
-
-def _require_postgres() -> None:
-    url = _server_url()
-    engine = create_engine(url, connect_args={"connect_timeout": 3})
-    try:
-        with engine.connect():
-            pass
-    except OperationalError:
-        pytest.skip(
-            f"Postgres not reachable at {url.host}:{url.port}/{url.database} "
-            "(start it with `make db-up` and point DATABASE_URL at it)",
-            allow_module_level=True,
-        )
-    finally:
-        engine.dispose()
-
-
-_require_postgres()
+_reason = pg.skip_reason()
+if _reason:
+    pytest.skip(_reason, allow_module_level=True)
 
 
 @pytest.fixture
 def temp_db_url() -> Iterator[URL]:
-    server = _server_url()
-    name = f"orchestrai_test_{uuid.uuid4().hex[:8]}"
-    admin = create_engine(server, isolation_level="AUTOCOMMIT")
-    with admin.connect() as conn:
-        conn.execute(text(f'CREATE DATABASE "{name}"'))
-    try:
-        yield server.set(database=name)
-    finally:
-        with admin.connect() as conn:
-            conn.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
-        admin.dispose()
-
-
-def _alembic_config(url: URL) -> Config:
-    cfg = Config(str(API_DIR / "alembic.ini"))
-    cfg.set_main_option("script_location", str(API_DIR / "migrations"))
-    # ConfigParser interpolation: escape '%' in the URL.
-    cfg.set_main_option(
-        "sqlalchemy.url", url.render_as_string(hide_password=False).replace("%", "%%")
-    )
-    cfg.attributes["configure_logger"] = False
-    return cfg
+    with pg.temp_database() as url:
+        yield url
 
 
 @pytest.fixture
 def migrated_db(temp_db_url: URL) -> Iterator[URL]:
-    command.upgrade(_alembic_config(temp_db_url), "head")
+    command.upgrade(pg.alembic_config(temp_db_url), "head")
     yield temp_db_url
 
 
@@ -144,7 +102,7 @@ def test_models_match_migration(migrated_db: URL) -> None:
 
 
 def test_downgrade_removes_everything_and_upgrade_again(migrated_db: URL) -> None:
-    cfg = _alembic_config(migrated_db)
+    cfg = pg.alembic_config(migrated_db)
 
     command.downgrade(cfg, "base")
     engine = create_engine(migrated_db)
