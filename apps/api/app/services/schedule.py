@@ -21,7 +21,7 @@ def build_schedule(session: Session, project: Project, as_of: date | None = None
         progress = dict(
             session.execute(
                 select(Task.id, Task.percent_complete).where(Task.project_id == project.id)
-            ).tuples()
+            ).all()
         )
     rows = session.execute(
         select(Assignment.task_id, Assignment.member_id)
