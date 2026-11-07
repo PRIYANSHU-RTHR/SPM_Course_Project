@@ -52,6 +52,14 @@ class Load:
 
     horizon: Window
     committed: dict[int, list[tuple[Window, float]]] = field(default_factory=dict)
+    _cap: dict[tuple[int, Window], float] = field(default_factory=dict, repr=False)
+
+    def capacity(self, member: MemberInput, window: Window) -> float:
+        """calendar.capacity, cached per (member, window): it walks every day of the window."""
+        key = (member.id, window)
+        if key not in self._cap:
+            self._cap[key] = calendar.capacity(member, *window)
+        return self._cap[key]
 
     def add(self, member_id: int, window: Window, hours: float) -> None:
         self.committed.setdefault(member_id, []).append((window, hours))
@@ -68,7 +76,7 @@ class Load:
 
     def utilisation(self, member: MemberInput) -> float:
         hours = sum(h for _, h in self.committed.get(member.id, []))
-        cap = calendar.capacity(member, *self.horizon)
+        cap = self.capacity(member, self.horizon)
         if cap > 0:
             return hours / cap
         return 0.0 if hours == 0 else math.inf
@@ -110,7 +118,7 @@ def score(
     )
     skill_fit = sum(m.weight * m.fit for m in matches) if matches else 1.0
 
-    free = calendar.capacity(member, *window) - load.hours_in(member.id, window)
+    free = load.capacity(member, window) - load.hours_in(member.id, window)
     capacity_fit = 1.0 if hours <= 0 else min(max(free / hours, 0.0), 1.0)
 
     util = load.utilisation(member)
@@ -167,6 +175,11 @@ def _evaluate(
     return ok, rejected
 
 
+# shortcut: first-improvement single moves, capped passes; a swap/MIP search could do better
+# on big teams, but this already guarantees optimal >= greedy.
+MAX_SEARCH_PASSES = 5
+
+
 def _plan(
     mode: str,
     recs: dict[int, TaskRecommendation],
@@ -206,21 +219,46 @@ def recommend_greedy(
 ) -> AssignmentPlan:
     """Assign one task at a time to its best-scoring eligible member."""
     by_id, h, _, order = _inputs(tasks, hours)
+    recs, load = _replay(by_id, members, windows, h, order, weights, picks=None)
+    return _plan("greedy", recs, order, members, load)
+
+
+def _replay(
+    by_id: Mapping[int, TaskInput],
+    members: Sequence[MemberInput],
+    windows: Mapping[int, Window],
+    h: Mapping[int, float],
+    order: Sequence[int],
+    weights: AssignmentWeights | None,
+    picks: Mapping[int, int | None] | None,
+) -> tuple[dict[int, TaskRecommendation], Load]:
+    """Score tasks one at a time in `order`, updating load after each pick.
+
+    `picks=None` takes each task's best candidate (greedy); otherwise the given member.
+    Both modes are scored this way, so their totals are comparable.
+    """
     load = Load(_horizon(windows)) if windows else Load((date.min, date.min))
     recs: dict[int, TaskRecommendation] = {}
     for i in order:
         ok, rejected = _evaluate(by_id[i], members, windows[i], h[i], load, weights)
-        best = ok[0] if ok else None
-        if best:
-            load.add(best.member_id, windows[i], h[i])
+        if picks is None:
+            chosen = ok[0] if ok else None
+        else:
+            chosen = next((c for c in ok if c.member_id == picks.get(i)), None)
+        if chosen:
+            load.add(chosen.member_id, windows[i], h[i])
         recs[i] = TaskRecommendation(
             task_id=i,
-            member_id=best.member_id if best else None,
-            score=best.score if best else None,
+            member_id=chosen.member_id if chosen else None,
+            score=chosen.score if chosen else None,
             candidates=tuple(ok[:TOP_N]),
             ineligible=tuple(rejected),
         )
-    return _plan("greedy", recs, order, members, load)
+    return recs, load
+
+
+def _total(recs: Mapping[int, TaskRecommendation]) -> float:
+    return sum(r.score.total for r in recs.values() if r.score)
 
 
 def recommend_optimal(
@@ -230,7 +268,12 @@ def recommend_optimal(
     hours: Mapping[int, float] | None = None,
     weights: AssignmentWeights | None = None,
 ) -> AssignmentPlan:
-    """Per topological wave, maximise total score with the Hungarian method."""
+    """Hungarian method per topological wave, then local search on the whole plan.
+
+    Scores depend on load, so a per-wave optimum is not a whole-plan optimum. The wave
+    result (or greedy's, if it replays higher) is improved by moving single tasks to
+    another eligible member while the replayed total rises. Never worse than greedy.
+    """
     by_id, h, level, order = _inputs(tasks, hours)
     load = Load(_horizon(windows)) if windows else Load((date.min, date.min))
     recs: dict[int, TaskRecommendation] = {}
@@ -269,7 +312,57 @@ def recommend_optimal(
                 load.add(member_id, windows[i], h[i])
                 pending.remove(i)
 
-    return _plan("optimal", recs, order, members, load)
+    picks = _local_search(by_id, members, windows, h, order, weights, recs)
+    final, load = _replay(by_id, members, windows, h, order, weights, picks)
+    return _plan("optimal", final, order, members, load)
+
+
+def _local_search(
+    by_id: Mapping[int, TaskInput],
+    members: Sequence[MemberInput],
+    windows: Mapping[int, Window],
+    h: Mapping[int, float],
+    order: Sequence[int],
+    weights: AssignmentWeights | None,
+    wave_recs: Mapping[int, TaskRecommendation],
+) -> dict[int, int | None]:
+    by_member = {m.id: m for m in members}
+    caps: dict[tuple[int, Window], float] = {}
+
+    def total(p: Mapping[int, int | None]) -> float:
+        """Replayed total, scoring only the picked member (what the search compares)."""
+        load = Load(_horizon(windows), _cap=caps) if windows else Load((date.min, date.min))
+        out = 0.0
+        for i in order:
+            member_id = p.get(i)
+            if member_id is None:
+                continue
+            m = by_member[member_id]
+            out += score(by_id[i], m, windows[i], h[i], load, members, weights).total
+            load.add(member_id, windows[i], h[i])
+        return out
+
+    greedy_recs, _ = _replay(by_id, members, windows, h, order, weights, picks=None)
+    starts = [{i: r.member_id for i, r in wave_recs.items()}]
+    starts.append({i: r.member_id for i, r in greedy_recs.items()})
+    best = max(starts, key=total)  # ties keep the wave result
+    best_total = total(best)
+    eligible = {
+        i: [m.id for m in members if is_eligible(by_id[i], m, windows[i])[0]] for i in order
+    }
+    for _ in range(MAX_SEARCH_PASSES):
+        improved = False
+        for i in order:
+            for member_id in eligible[i]:
+                if member_id == best[i]:
+                    continue
+                trial = {**best, i: member_id}
+                t = total(trial)
+                if t > best_total + 1e-9:
+                    best, best_total, improved = trial, t, True
+        if not improved:
+            break
+    return best
 
 
 @dataclass(frozen=True, slots=True)
