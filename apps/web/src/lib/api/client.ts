@@ -40,10 +40,16 @@ async function readError(response: Response): Promise<ApiError> {
 }
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
-  })
+  let response: Response
+  try {
+    response = await fetch(`${API_URL}${path}`, {
+      ...init,
+      headers: { 'Content-Type': 'application/json', ...init?.headers },
+    })
+  } catch (cause) {
+    if (cause instanceof DOMException && cause.name === 'AbortError') throw cause
+    throw new ApiError(0, 'Could not reach the API. Check that it is running.', 'network_error')
+  }
   if (!response.ok) throw await readError(response)
   return (await response.json()) as T
 }

@@ -1,5 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router'
 import { AppShell } from '@/components/shell/AppShell'
+import { OverviewPage } from '@/features/projects/OverviewPage'
+import { ProjectsPage } from '@/features/projects/ProjectsPage'
 import { StyleguidePage } from '@/features/styleguide/StyleguidePage'
 import { ErrorPage } from './pages/ErrorPage'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -11,28 +13,8 @@ export const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Navigate to="/projects" replace /> },
-      {
-        path: 'projects',
-        element: (
-          <PlaceholderPage
-            label="Projects"
-            title="All projects"
-            step={19}
-            body="The projects table with deadline, progress, P(on time), SPI and open risks."
-          />
-        ),
-      },
-      {
-        path: 'projects/:projectId',
-        element: (
-          <PlaceholderPage
-            label="Overview"
-            title="Project overview"
-            step={19}
-            body="KPI strip, S-curve, the next tasks on the critical path and the top risks."
-          />
-        ),
-      },
+      { path: 'projects', element: <ProjectsPage /> },
+      { path: 'projects/:projectId', element: <OverviewPage /> },
       {
         path: 'projects/:projectId/schedule',
         element: (
