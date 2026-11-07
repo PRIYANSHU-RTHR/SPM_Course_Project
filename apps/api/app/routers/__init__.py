@@ -16,6 +16,7 @@ from app.routers import (
     schedule,
     skills,
     tasks,
+    workflows,
 )
 
 ROUTERS: tuple[APIRouter, ...] = (
@@ -32,4 +33,5 @@ ROUTERS: tuple[APIRouter, ...] = (
     forecast.router,
     evm.router,
     risks.router,
+    workflows.router,
 )
