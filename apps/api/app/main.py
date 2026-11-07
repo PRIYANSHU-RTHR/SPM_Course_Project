@@ -1,5 +1,8 @@
 """FastAPI application factory."""
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
@@ -21,11 +24,26 @@ def operation_id(route: APIRoute) -> str:
     return f"{route.tags[0]}_{route.name}" if route.tags else route.name
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    yield
+    # The planning workflow runner is created lazily (routers/workflows.py); stop it if used.
+    workflows = getattr(app.state, "plan_workflows", None)
+    if workflows is not None:
+        workflows.shutdown()
+    pool = getattr(app.state, "plan_workflows_pool", None)
+    if pool is not None:
+        pool.close()
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
 
     app = FastAPI(
-        title="OrchestrAI API", version=__version__, generate_unique_id_function=operation_id
+        title="OrchestrAI API",
+        version=__version__,
+        generate_unique_id_function=operation_id,
+        lifespan=lifespan,
     )
     app.state.settings = settings
 
