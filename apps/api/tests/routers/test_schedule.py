@@ -47,7 +47,7 @@ def test_schedule_delays_second_task_on_same_member(api: Client) -> None:
     with factory() as s:
         pid, tasks = _seed(s, 40)
 
-    body = http.get(f"/projects/{pid}/schedule").json()
+    body = http.get(f"/projects/{pid}/schedule", params={"as_of": "2026-11-09"}).json()
 
     assert [(t["task_id"], t["start"]) for t in body["tasks"]] == [
         (tasks[0], "2026-11-09"),
@@ -56,6 +56,23 @@ def test_schedule_delays_second_task_on_same_member(api: Client) -> None:
     assert body["delayed"] == [tasks[1]]
     assert body["finish"] == "2026-11-10"
     assert body["loads"][0]["hours"] == 16
+
+
+def test_schedule_plans_remaining_work_from_as_of(api: Client) -> None:
+    http, factory = api
+    with factory() as s:
+        pid, tasks = _seed(s, 40)
+        s.get_one(Task, tasks[0]).percent_complete = 100
+        s.commit()
+
+    body = http.get(f"/projects/{pid}/schedule", params={"as_of": "2026-11-12"}).json()
+
+    # Done task keeps its Monday; the untouched one moves from its Tuesday plan to as_of.
+    assert [(t["start"], t["end"]) for t in body["tasks"]] == [
+        ("2026-11-09", "2026-11-09"),
+        ("2026-11-12", "2026-11-12"),
+    ]
+    assert body["finish"] == "2026-11-12"
 
 
 def test_schedule_zero_capacity_is_422(api: Client) -> None:

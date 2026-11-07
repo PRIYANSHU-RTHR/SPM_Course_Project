@@ -6,6 +6,10 @@ which its assignee has free hours, and its work is spread over the following wor
 days at whatever capacity the member has left (hours_per_week / 5, 0 on leave).
 Unassigned tasks use the plain project calendar (8 h/day, no contention).
 Granularity is one day: a successor starts the working day after its predecessor ends.
+
+With `as_of`, only the remaining work ((1 - percent/100) x hours) is planned, from `as_of`
+on. Finished tasks keep their baseline window (cut off before `as_of`); started tasks keep
+their baseline start. Without `as_of` the result is the baseline that EVM measures against.
 """
 
 import heapq
@@ -57,6 +61,13 @@ def _order(tasks: Sequence[TaskInput], critical: set[int]) -> list[int]:
     return order
 
 
+def _previous_working_day(d: date) -> date:
+    d -= timedelta(days=1)
+    while not calendar.is_working_day(d):
+        d -= timedelta(days=1)
+    return d
+
+
 def _monday(d: date) -> date:
     return d - timedelta(days=d.weekday())
 
@@ -68,8 +79,13 @@ def schedule(
     project_start: date,
     durations: Mapping[int, float] | None = None,
     cpm_result: CPMResult | None = None,
+    progress: Mapping[int, float] | None = None,
+    as_of: date | None = None,
 ) -> ScheduleResult:
-    """Place every task; `assignments` maps task id -> member id (missing/None = unassigned)."""
+    """Place every task; `assignments` maps task id -> member id (missing/None = unassigned).
+
+    `progress` maps task id -> percent complete; it is only used together with `as_of`.
+    """
     hours = {t.id: (durations[t.id] if durations else pert(t).te) for t in tasks}
     plan = cpm_result or cpm(tasks, hours)  # also validates the graph (cycles, unknown ids)
     rows = {r.task_id: r for r in plan.tasks}
@@ -88,6 +104,13 @@ def schedule(
             )
 
     start = calendar.next_working_day(project_start)
+    today = start
+    base: dict[int, ScheduledTask] = {}
+    if as_of is not None:
+        today = calendar.next_working_day(max(as_of, project_start))
+        baseline = schedule(tasks, assignments, members, project_start, durations, plan)
+        base = {t.task_id: t for t in baseline.tasks}
+    done = {i: min(max(v, 0.0), 100.0) for i, v in (progress or {}).items()} if base else {}
     booked: dict[int, dict[date, float]] = defaultdict(lambda: defaultdict(float))
     end_of: dict[int, date] = {}
     placed: list[ScheduledTask] = []
@@ -99,13 +122,15 @@ def schedule(
             (calendar.add_working_days(end_of[p], 1) for p in by_id[i].predecessors),
             default=start,
         )
+        day = max(day, today)
 
         def free(d: date, member: MemberInput | None = member) -> float:
             if member is None:
                 return calendar.HOURS_PER_DAY if calendar.is_working_day(d) else 0.0
             return calendar.daily_capacity(member, d) - booked[member.id][d]
 
-        remaining = hours[i]
+        pct = done.get(i, 0.0)
+        remaining = hours[i] * (1 - pct / 100)
         first = last = None
         for _ in range(MAX_DAYS):
             if remaining <= _EPS:
@@ -121,6 +146,11 @@ def schedule(
         else:
             raise ScheduleError(f"task {i} cannot be finished within {MAX_DAYS} days")
 
+        if pct > 0 and first is None:  # finished: keep its baseline window, ended before today
+            last = min(base[i].end, _previous_working_day(today))
+            first = min(base[i].start, last)
+        elif pct > 0 and first is not None:  # started: it began on its baseline start
+            first = min(base[i].start, first)
         if first is None or last is None:  # zero-hour task: a milestone on its earliest day
             first = last = calendar.next_working_day(day)
         end_of[i] = last
@@ -139,7 +169,7 @@ def schedule(
 
     finish = max(end_of.values(), default=start)
     loads = []
-    week = _monday(start)
+    week = _monday(today)
     while week <= finish:
         days = calendar.working_days(week, week + timedelta(days=4))
         for m in members:

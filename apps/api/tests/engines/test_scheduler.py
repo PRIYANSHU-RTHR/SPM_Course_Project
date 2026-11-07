@@ -96,3 +96,48 @@ def test_long_task_crosses_into_next_week() -> None:
     result = schedule([_t(1, 8), _t(2, 40, 1)], {1: 1, 2: 1}, [M1], MON)
     assert _dates(result)[2] == (TUE, NEXT_MON)
     assert result.finish == NEXT_MON
+
+
+# --- remaining work from as_of ------------------------------------------------------------
+
+
+def test_as_of_without_progress_moves_unstarted_work_to_as_of() -> None:
+    result = schedule([_t(1, 8), _t(2, 8, 1)], {1: 1, 2: 1}, [M1], MON, as_of=WED)
+    assert _dates(result) == {1: (WED, WED), 2: (THU, THU)}
+    assert result.finish == THU
+
+
+def test_as_of_before_start_is_the_baseline() -> None:
+    tasks = [_t(1, 16), _t(2, 8, 1)]
+    baseline = schedule(tasks, {1: 1, 2: 1}, [M1], MON)
+    early = schedule(tasks, {1: 1, 2: 1}, [M1], MON, as_of=date(2026, 11, 2))
+    assert _dates(early) == _dates(baseline)
+
+
+def test_finished_task_keeps_its_window_and_successor_starts_as_of() -> None:
+    # A planned Mon-Tue, done. B planned Wed; replanned on Thursday it runs Thursday.
+    tasks = [_t(1, 16), _t(2, 8, 1)]
+    result = schedule(tasks, {1: 1, 2: 1}, [M1], MON, progress={1: 100}, as_of=THU)
+    assert _dates(result) == {1: (MON, TUE), 2: (THU, THU)}
+    assert result.tasks[0].hours == 16  # full size is still reported
+
+
+def test_task_finished_early_is_cut_off_before_as_of() -> None:
+    # A planned Mon-Wed (24 h) but done by Tuesday: its bar ends Monday, B starts Tuesday.
+    result = schedule(
+        [_t(1, 24), _t(2, 8, 1)], {1: 1, 2: 1}, [M1], MON, progress={1: 100}, as_of=TUE
+    )
+    assert _dates(result) == {1: (MON, MON), 2: (TUE, TUE)}
+
+
+def test_started_task_plans_only_remaining_hours_and_keeps_its_start() -> None:
+    # 32 h task, 75% done on Wednesday: 8 h left -> ends Wednesday, started Monday.
+    result = schedule([_t(1, 32)], {1: 1}, [M1], MON, progress={1: 75}, as_of=WED)
+    assert _dates(result) == {1: (MON, WED)}
+    assert [w.hours for w in result.loads if w.member_id == 1] == [8]
+
+
+def test_late_task_slips_past_the_baseline() -> None:
+    # 16 h task planned Mon-Tue, only 25% done on Wednesday: 12 h left -> Wed + half of Thu.
+    result = schedule([_t(1, 16)], {1: 1}, [M1], MON, progress={1: 25}, as_of=WED)
+    assert _dates(result) == {1: (MON, THU)}
