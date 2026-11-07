@@ -12,14 +12,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.engines.montecarlo import DEFAULT_RUNS
-from app.engines.risk import RiskConfig, RiskFinding, RiskSnapshot, TaskState, detect_risks
-from app.models import Assignment, AuditLog, Member, Project, Risk, RiskCategory, RiskStatus, Task
+from app.engines.risk import RiskConfig, RiskFinding, RiskSnapshot, detect_risks
+from app.models import AuditLog, Project, Risk, RiskCategory, RiskStatus
 from app.schemas.risk import RiskRefreshResult
 from app.services.common import PageParams, commit, paginate
-from app.services.evm import build_evm
-from app.services.forecast import build_forecast
-from app.services.inputs import get_project, load_members, load_tasks, run_cpm
-from app.services.schedule import build_schedule
+from app.services.inputs import get_project
+from app.services.scenario import load_scenario
 
 ACTOR = "system:risk-engine"
 
@@ -27,27 +25,9 @@ ACTOR = "system:risk-engine"
 def build_snapshot(
     session: Session, project: Project, as_of: date, seed: int, runs: int = DEFAULT_RUNS
 ) -> RiskSnapshot:
-    tasks = load_tasks(session, project.id)
-    rows = session.scalars(select(Task).where(Task.project_id == project.id)).all()
-    current = session.execute(
-        select(Assignment.task_id, Assignment.member_id)
-        .join(Task, Task.id == Assignment.task_id)
-        .where(Task.project_id == project.id, Assignment.is_current)
-    )
-    plan = build_schedule(session, project)
-    return RiskSnapshot(
-        as_of=as_of,
-        project_start=project.start_date,
-        tasks=tuple(tasks),
-        task_state={t.id: TaskState(t.title, t.status.value, t.percent_complete) for t in rows},
-        members=tuple(load_members(session)),
-        member_names=dict(session.execute(select(Member.id, Member.name)).all()),
-        assignments={row.task_id: row.member_id for row in current},
-        cpm=run_cpm(tasks),
-        schedule=plan,
-        forecast=build_forecast(session, project, runs, seed, tasks) if tasks else None,
-        evm=build_evm(session, project, as_of, plan) if tasks else None,
-    )
+    """Same inputs as every what-if (services.scenario), so the register and the
+    reallocation proposals agree. The forecast is the resource-adjusted one."""
+    return load_scenario(session, project, as_of, seed, runs).evaluate().snapshot
 
 
 def _state(risk: Risk) -> dict[str, Any]:

@@ -12,8 +12,10 @@ from app.routers import (
     forecast,
     members,
     projects,
+    reallocation,
     risks,
     schedule,
+    simulation,
     skills,
     tasks,
     workflows,
@@ -34,4 +36,7 @@ ROUTERS: tuple[APIRouter, ...] = (
     evm.router,
     risks.router,
     workflows.router,
+    reallocation.router,
+    simulation.router,
+    simulation.audit_router,
 )

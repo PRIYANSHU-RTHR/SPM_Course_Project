@@ -1,4 +1,6 @@
-"""Planning workflow endpoints: start, live events (SSE), state, PM decision."""
+"""Workflow endpoints shared by the planning (Step 15) and reallocation (Step 17) graphs:
+start a plan, live events (SSE), state, PM decision. Thread ids starting with `realloc-`
+belong to the reallocation runner."""
 
 import json
 import threading
@@ -7,10 +9,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, Header, Request
 from fastapi.concurrency import run_in_threadpool
+from pydantic import Field
 from sse_starlette import EventSourceResponse, ServerSentEvent
 
 from app.db import get_session_factory
 from app.schemas.common import CONFLICT, NOT_FOUND
+from app.schemas.reallocation import ReallocationState
 from app.schemas.workflow import (
     PlanDecision,
     PlanStart,
@@ -19,32 +23,32 @@ from app.schemas.workflow import (
     WorkflowEvent,
     WorkflowState,
 )
-from app.services.workflows import PlanWorkflows, postgres_workflows
+from app.services.workflows import Workflows, postgres_workflows
 
 router = APIRouter(prefix="/workflows", tags=["workflows"])
 _init_lock = threading.Lock()
 
+AnyWorkflowState = Annotated[WorkflowState | ReallocationState, Field(discriminator="kind")]
 
-def get_plan_workflows(request: Request) -> PlanWorkflows:
+
+def get_workflows(request: Request) -> Workflows:
     """Created on first use (not at startup), so the API starts even when Postgres is down.
-    Tests put their own InMemorySaver-backed instance on `app.state.plan_workflows` first."""
+    Tests put their own InMemorySaver-backed instance on `app.state.workflows` first."""
     state = request.app.state
     with _init_lock:
-        if getattr(state, "plan_workflows", None) is None:
-            state.plan_workflows, state.plan_workflows_pool = postgres_workflows(
-                state.settings, get_session_factory()
-            )
-    workflows: PlanWorkflows = state.plan_workflows
+        if getattr(state, "workflows", None) is None:
+            state.workflows = postgres_workflows(state.settings, get_session_factory())
+    workflows: Workflows = state.workflows
     return workflows
 
 
-WorkflowsDep = Annotated[PlanWorkflows, Depends(get_plan_workflows)]
+WorkflowsDep = Annotated[Workflows, Depends(get_workflows)]
 
 
 @router.post("/plan", name="start_plan", status_code=202, response_model=PlanStarted)
 def start_plan(body: PlanStart, workflows: WorkflowsDep) -> PlanStarted:
     """Start brief -> WBS -> estimates -> schedule -> owners; it pauses for PM review."""
-    return PlanStarted(thread_id=workflows.start(body))
+    return PlanStarted(thread_id=workflows.plan.start(body))
 
 
 @router.get(
@@ -66,10 +70,11 @@ async def events(
 ) -> EventSourceResponse:
     """Past events, then live ones; the stream ends when the run is committed, rejected or
     failed. Reconnecting clients send `Last-Event-ID` to skip what they already have."""
-    await run_in_threadpool(workflows.state, thread_id)  # 404 before the stream starts
+    runner = workflows.runner(thread_id)
+    await run_in_threadpool(runner.state, thread_id)  # 404 before the stream starts
 
     async def stream() -> AsyncIterator[ServerSentEvent]:
-        async for event in workflows.subscribe(thread_id, last_event_id):
+        async for event in runner.subscribe(thread_id, last_event_id):
             body = WorkflowEvent.model_validate(event).model_dump(mode="json")
             yield ServerSentEvent(data=json.dumps(body), event=body["type"], id=str(body["seq"]))
 
@@ -77,11 +82,12 @@ async def events(
 
 
 @router.get(
-    "/{thread_id}/state", name="get_state", response_model=WorkflowState, responses=NOT_FOUND
+    "/{thread_id}/state", name="get_state", response_model=AnyWorkflowState, responses=NOT_FOUND
 )
-def get_state(thread_id: str, workflows: WorkflowsDep) -> WorkflowState:
-    """Status, current node, and the review payload while waiting for the PM."""
-    return workflows.state(thread_id)
+def get_state(thread_id: str, workflows: WorkflowsDep) -> WorkflowState | ReallocationState:
+    """Status, current node, and what the PM must decide on while waiting
+    (`kind` = plan: `review`; `kind` = reallocate: `proposal`)."""
+    return workflows.runner(thread_id).state(thread_id)
 
 
 @router.post(
@@ -94,6 +100,7 @@ def get_state(thread_id: str, workflows: WorkflowsDep) -> WorkflowState:
 def resume(
     thread_id: str, decision: Annotated[PlanDecision, Body()], workflows: WorkflowsDep
 ) -> ResumeAccepted:
-    """approve -> commit; edit -> re-estimate and review again; reject -> end."""
-    workflows.resume(thread_id, decision)
+    """Plan: approve -> commit; edit -> re-estimate and review again; reject -> end.
+    Reallocation: approve -> apply new owners; reject (reason required) -> owners unchanged."""
+    workflows.runner(thread_id).resume(thread_id, decision)
     return ResumeAccepted(thread_id=thread_id, status="running")

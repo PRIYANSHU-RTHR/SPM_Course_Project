@@ -138,6 +138,7 @@ class _Decision(BaseModel):
 
 class ApproveDecision(_Decision):
     action: Literal["approve"]
+    reason: str | None = Field(default=None, max_length=2000)
 
 
 class EditDecision(_Decision):
@@ -164,6 +165,7 @@ class ResumeAccepted(BaseModel):
 
 
 class WorkflowState(BaseModel):
+    kind: Literal["plan"] = "plan"
     thread_id: str
     status: WorkflowStatus
     node: str | None = Field(description="Running: node in progress. Waiting: pm_review")

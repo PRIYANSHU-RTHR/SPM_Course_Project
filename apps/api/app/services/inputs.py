@@ -1,6 +1,7 @@
 """Turns DB rows into engine inputs. Shared by every engine service."""
 
 from collections import defaultdict
+from datetime import UTC, date, datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
@@ -16,6 +17,11 @@ def get_project(session: Session, project_id: int) -> Project:
     if project is None:
         raise NotFoundError(f"Project {project_id} not found", details={"project_id": project_id})
     return project
+
+
+def project_today(project: Project) -> date:
+    """The project's simulated clock (`sim_date`), else today's date in UTC."""
+    return project.sim_date or datetime.now(UTC).date()
 
 
 def load_tasks(session: Session, project_id: int) -> list[TaskInput]:

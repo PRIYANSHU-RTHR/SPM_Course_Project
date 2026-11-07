@@ -40,6 +40,8 @@ class Project(TimestampMixin, Base):
     # Money as exact decimals (INR, 2 dp) — never float.
     budget: Mapped[Decimal] = mapped_column(Numeric(14, 2))
     hourly_rate: Mapped[Decimal] = mapped_column(Numeric(10, 2))
+    # Simulated "today" for demos (POST /projects/{id}/simulate/advance); NULL = real date.
+    sim_date: Mapped[date | None] = mapped_column(Date)
 
     epics: Mapped[list["Epic"]] = relationship(
         back_populates="project",

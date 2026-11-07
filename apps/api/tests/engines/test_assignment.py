@@ -138,3 +138,21 @@ def test_zero_capacity_member_gets_no_capacity_points() -> None:
     s = score(T1, idle, WEEK, 30, Load(WEEK), [idle])
     assert s.capacity_fit == 0
     assert s.total == pytest.approx(100 * (0.6 + 0.15))
+
+
+def test_optimal_respects_existing_load_and_leaves_it_untouched() -> None:
+    # Empty load: M1 and M2 both score 100 on T1 (python fit 1, full capacity, balance 1);
+    # the tie goes to the lower id, M1.
+    assert recommend_optimal([T1], TEAM, {1: WEEK}).recommendations[0].member_id == 1
+
+    # M1 is already booked 40 h that week: capacity_fit 0 and balance 0 -> 60 points,
+    # while M2 still scores 100, so the re-plan moves T1 to M2.
+    busy = Load(WEEK)
+    busy.add(1, WEEK, 40)
+    plan = recommend_optimal([T1], TEAM, {1: WEEK}, base_load=busy)
+
+    [rec] = plan.recommendations
+    assert rec.member_id == 2
+    assert rec.score is not None
+    assert rec.score.total == pytest.approx(100)
+    assert busy.committed == {1: [(WEEK, 40)]}  # copied, not modified

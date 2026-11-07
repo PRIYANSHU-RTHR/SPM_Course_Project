@@ -36,3 +36,10 @@ class RiskStatus(StrEnum):
     OPEN = "open"
     MITIGATING = "mitigating"
     CLOSED = "closed"
+
+
+class ReallocationStatus(StrEnum):
+    PENDING = "pending"  # proposal waiting for the PM
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    FAILED = "failed"

@@ -1,4 +1,4 @@
-from datetime import UTC, date, datetime
+from datetime import date
 from typing import Annotated
 
 from fastapi import APIRouter, Query, Request
@@ -9,6 +9,7 @@ from app.schemas.common import CONFLICT, NOT_FOUND
 from app.schemas.risk import RiskPage, RiskRead, RiskRefreshResult
 from app.services import agents
 from app.services import risk_service as service
+from app.services.inputs import get_project, project_today
 
 router = APIRouter(prefix="/projects", tags=["risks"])
 
@@ -40,13 +41,15 @@ def refresh_risks(
     request: Request,
     session: SessionDep,
     project_id: int,
-    as_of: Annotated[date | None, Query(description="Status date (default: today, UTC)")] = None,
+    as_of: Annotated[
+        date | None, Query(description="Status date (default: the project's clock)")
+    ] = None,
 ) -> RiskRefreshResult:
     """Re-run every risk rule; opens, updates, reopens and closes register rows."""
     return service.refresh_risks(
         session,
         project_id,
-        as_of or datetime.now(UTC).date(),
+        as_of or project_today(get_project(session, project_id)),
         request.app.state.settings.sim_seed,
     )
 

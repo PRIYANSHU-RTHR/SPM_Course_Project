@@ -12,9 +12,12 @@ state, but the timeline restarts empty (`PlanWorkflows.subscribe` sends the fina
 import asyncio
 import contextlib
 import threading
+import time
 from collections import defaultdict
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
 from typing import Any
+
+from langgraph.errors import GraphInterrupt
 
 from app.schemas.workflow import TERMINAL_STATUSES
 
@@ -89,3 +92,31 @@ class EventBus:
         finally:
             with self._lock:
                 self._subscribers[thread_id].discard(key)
+
+
+NodeResult = tuple[Any, str]  # (state update or Command, one-line summary for the timeline)
+Publish = Callable[[Event], Any]
+
+
+def timed(name: str, fn: Callable[[Any], NodeResult], publish: Publish) -> Callable[[Any], Any]:
+    """Wrap a graph node: publish start/end events with duration and the node's summary.
+    An interrupt ends the node as 'waiting'; it starts again on resume."""
+
+    def node(state: Any) -> Any:
+        base = {"thread_id": state["thread_id"], "type": "node", "node": name}
+        publish({**base, "phase": "start"})
+        started = time.perf_counter()
+
+        def end(summary: str) -> None:
+            ms = round((time.perf_counter() - started) * 1000, 1)
+            publish({**base, "phase": "end", "duration_ms": ms, "summary": summary})
+
+        try:
+            update, summary = fn(state)
+        except GraphInterrupt:
+            end("waiting for PM review")
+            raise
+        end(summary)
+        return update
+
+    return node
