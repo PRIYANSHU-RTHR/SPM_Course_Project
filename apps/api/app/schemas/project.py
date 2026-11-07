@@ -43,6 +43,7 @@ class ProjectRead(ReadModel):
     deadline: date
     budget: Money
     hourly_rate: Money
+    sim_date: date | None = Field(description="Simulated today (demo clock); null = real date")
     created_at: datetime
     updated_at: datetime
 

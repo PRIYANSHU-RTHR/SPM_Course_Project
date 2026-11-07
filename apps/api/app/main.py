@@ -27,13 +27,10 @@ def operation_id(route: APIRoute) -> str:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
-    # The planning workflow runner is created lazily (routers/workflows.py); stop it if used.
-    workflows = getattr(app.state, "plan_workflows", None)
+    # Workflow runners are created lazily (routers/workflows.py); stop them if they were used.
+    workflows = getattr(app.state, "workflows", None)
     if workflows is not None:
         workflows.shutdown()
-    pool = getattr(app.state, "plan_workflows_pool", None)
-    if pool is not None:
-        pool.close()
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:

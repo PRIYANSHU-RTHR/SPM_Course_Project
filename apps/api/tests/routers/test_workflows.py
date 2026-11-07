@@ -21,7 +21,7 @@ from app.agents.planning import DEMO_BRIEF
 from app.config import Settings
 from app.models import Assignment, AuditLog, Dependency, Epic, Project, Task
 from app.seed import seed_demo
-from app.services.workflows import PlanWorkflows
+from app.services.workflows import PlanWorkflows, build_workflows
 from app.workflows.events import EventBus
 from app.workflows.plan import PlanDeps, build_plan_graph
 
@@ -46,10 +46,10 @@ def workflows(
 ) -> Iterator[PlanWorkflows]:
     seed_demo(db, seed=42, as_of=date(2026, 11, 6))
     db.commit()
-    runner = PlanWorkflows(InMemorySaver(), session_factory, _llm())
-    client.app.state.plan_workflows = runner  # type: ignore[attr-defined]
-    yield runner
-    runner.shutdown()
+    runners = build_workflows(InMemorySaver(), session_factory, _llm(), seed=42)
+    client.app.state.workflows = runners  # type: ignore[attr-defined]
+    yield runners.plan
+    runners.shutdown()
 
 
 def _start(client: TestClient, runner: PlanWorkflows) -> str:
