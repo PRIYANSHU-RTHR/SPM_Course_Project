@@ -53,6 +53,9 @@ class Load:
     horizon: Window
     committed: dict[int, list[tuple[Window, float]]] = field(default_factory=dict)
 
+    def copy(self) -> "Load":
+        return Load(self.horizon, {k: list(v) for k, v in self.committed.items()})
+
     def add(self, member_id: int, window: Window, hours: float) -> None:
         self.committed.setdefault(member_id, []).append((window, hours))
 
@@ -229,10 +232,18 @@ def recommend_optimal(
     windows: Mapping[int, Window],
     hours: Mapping[int, float] | None = None,
     weights: AssignmentWeights | None = None,
+    base_load: Load | None = None,
 ) -> AssignmentPlan:
-    """Per topological wave, maximise total score with the Hungarian method."""
+    """Per topological wave, maximise total score with the Hungarian method.
+
+    `base_load` is work members already have (e.g. their other tasks when only a few tasks
+    are re-planned); it is copied, never modified.
+    """
     by_id, h, level, order = _inputs(tasks, hours)
-    load = Load(_horizon(windows)) if windows else Load((date.min, date.min))
+    if base_load is not None:
+        load = base_load.copy()
+    else:
+        load = Load(_horizon(windows)) if windows else Load((date.min, date.min))
     recs: dict[int, TaskRecommendation] = {}
 
     for wave in sorted(set(level.values())):

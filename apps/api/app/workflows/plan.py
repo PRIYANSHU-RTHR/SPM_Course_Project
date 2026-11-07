@@ -11,7 +11,6 @@ payload comes from an engine. `pm_review` is the only interrupt. Its resume valu
 reject -> end. State holds plain JSON values only, so any checkpointer can serialise it.
 """
 
-import time
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from datetime import date
@@ -19,7 +18,6 @@ from decimal import Decimal
 from itertools import pairwise
 from typing import Any, Literal, TypedDict
 
-from langgraph.errors import GraphInterrupt
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import Command, interrupt
 from pydantic import TypeAdapter
@@ -72,6 +70,7 @@ from app.schemas.workflow import (
 )
 from app.services.assignment import apply as apply_assignments
 from app.services.inputs import load_members
+from app.workflows.events import NodeResult, timed
 
 NODES = ("decompose", "validate", "estimate", "schedule", "recommend", "pm_review", "commit")
 APPROVED_ACTION = "workflow.plan_approved"
@@ -220,31 +219,6 @@ def apply_changes(
 
 
 # -- graph --------------------------------------------------------------------------------------
-
-NodeResult = tuple[Any, str]  # (state update or Command, one-line summary for the timeline)
-
-
-def _timed(name: str, fn: Callable[[PlanState], NodeResult], deps: PlanDeps) -> Callable:
-    """Publish start/end events around a node. An interrupt ends the node as 'waiting'."""
-
-    def node(state: PlanState) -> Any:
-        base = {"thread_id": state["thread_id"], "type": "node", "node": name}
-        deps.publish({**base, "phase": "start"})
-        started = time.perf_counter()
-
-        def end(summary: str) -> None:
-            ms = round((time.perf_counter() - started) * 1000, 1)
-            deps.publish({**base, "phase": "end", "duration_ms": ms, "summary": summary})
-
-        try:
-            update, summary = fn(state)
-        except GraphInterrupt:
-            end("waiting for PM review")
-            raise
-        end(summary)
-        return update
-
-    return node
 
 
 def build_plan_graph(deps: PlanDeps) -> StateGraph:
@@ -511,7 +485,7 @@ def build_plan_graph(deps: PlanDeps) -> StateGraph:
     }
     for name, fn in fns.items():
         destinations = ("estimate", "commit", END) if name == "pm_review" else None
-        graph.add_node(name, _timed(name, fn, deps), destinations=destinations)
+        graph.add_node(name, timed(name, fn, deps.publish), destinations=destinations)
     graph.add_edge(START, "decompose")
     for a, b in pairwise(NODES[:6]):  # decompose ... pm_review; pm_review routes by Command
         graph.add_edge(a, b)

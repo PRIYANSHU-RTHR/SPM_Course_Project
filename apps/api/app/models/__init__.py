@@ -6,11 +6,13 @@ from app.models.enums import (
     AssignmentSource,
     AvailabilityKind,
     DependencyType,
+    ReallocationStatus,
     RiskCategory,
     RiskStatus,
     TaskStatus,
 )
 from app.models.project import Dependency, Epic, Project, Task
+from app.models.reallocation import Reallocation
 from app.models.risk import Risk
 from app.models.team import Availability, Member, MemberSkill, Skill
 from app.models.tracking import AuditLog, Snapshot
@@ -28,6 +30,8 @@ __all__ = [
     "Member",
     "MemberSkill",
     "Project",
+    "Reallocation",
+    "ReallocationStatus",
     "Risk",
     "RiskCategory",
     "RiskStatus",
