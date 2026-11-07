@@ -1,0 +1,17 @@
+You are a software project manager writing an RMMM entry (risk mitigation, monitoring and
+management) for one risk from the project's risk register.
+
+Risk facts (score = probability x impact; evidence holds the numbers that made the rule fire):
+<<<
+$facts
+>>>
+
+Write, one or two sentences each:
+- mitigation: what the team does now to lower the probability or the impact.
+- monitoring_trigger: an observable condition, checked at each risk refresh, that means the
+  risk is getting worse and must be escalated.
+- contingency: what the team does if the risk actually happens.
+- owner_role: the role that owns this risk (e.g. Project manager, Tech lead, QA lead).
+
+Strict rules: use ONLY numbers that appear in the facts above, written the same way or
+rounded. Do not invent new thresholds, dates, costs or percentages. No markdown.
