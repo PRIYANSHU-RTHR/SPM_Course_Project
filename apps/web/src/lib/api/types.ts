@@ -1725,10 +1725,19 @@ export interface components {
              */
             planned: components["schemas"]["EvmPointOut"][];
         };
-        /** ProjectForecast */
+        /**
+         * ProjectForecast
+         * @description Resource-adjusted: the same evaluation as /metrics, the risk register and proposals.
+         */
         ProjectForecast: {
             /** Project Id */
             project_id: number;
+            /**
+             * As Of
+             * Format: date
+             * @description The project's clock (`sim_date`, else today)
+             */
+            as_of: string;
             /** Runs */
             runs: number;
             /** Seed */
@@ -1764,6 +1773,11 @@ export interface components {
             criticality: {
                 [key: string]: number;
             };
+            /**
+             * Resource Shift Hours
+             * @description Remaining work planned with owners, leave and progress minus the network alone (h); added to every run
+             */
+            resource_shift_hours: number;
         };
         /**
          * ProjectFull

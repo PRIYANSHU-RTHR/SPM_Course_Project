@@ -91,6 +91,7 @@ const percentile = (hours: number, on: string) => ({ hours, on })
 
 export const FORECAST: ProjectForecast = {
   project_id: 1,
+  as_of: '2026-11-06',
   runs: 5000,
   seed: 42,
   deadline: PROJECT.deadline,
@@ -103,6 +104,7 @@ export const FORECAST: ProjectForecast = {
   histogram: [],
   cdf: [],
   criticality: {},
+  resource_shift_hours: 0,
 }
 
 export const EVM: ProjectEvm = {
