@@ -180,3 +180,49 @@ sequenceDiagram
     UI->>API: GET /projects/{id}/audit?limit&offset
     API-->>UI: newest first, each row with a readable summary
 ```
+
+## Brief → plan flow
+
+The planning graph (`app/workflows/plan.py`) drafts, estimates, schedules and staffs a WBS, then pauses once at `pm_review`. Nothing is written to the project tables until the PM approves. An edit goes back through the engines, not the model, so a revised plan never needs a new LLM call.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor PM
+    participant UI as Web UI
+    participant API as FastAPI
+    participant WF as Planning graph
+    participant LLM as Gemini / fixture
+    participant ENG as Engines
+    participant DB as Postgres
+
+    PM->>UI: New plan → "Use the demo brief"
+    UI->>API: GET /workflows/plan/example
+    PM->>UI: Generate plan
+    UI->>API: POST /workflows/plan (X-Actor)
+    API-->>UI: 202 {thread_id}
+    UI->>API: GET /workflows/{thread_id}/events (SSE)
+    API->>WF: start(thread_id)
+    WF->>LLM: decompose: brief + team skills → WBS (structured output)
+    WF->>WF: validate: skills to vocabulary, hours ordered, cycles broken
+    WF->>ENG: estimate (PERT, COCOMO II) → schedule (CPM) → recommend (Hungarian)
+    WF-->>WF: interrupt() at pm_review (checkpointed)
+    API-->>UI: SSE node events, then run: waiting
+    UI->>API: GET /workflows/{thread_id}/state (review payload)
+    alt request changes
+        PM->>UI: edit o/m/p or skills
+        UI->>API: POST /workflows/{id}/resume {action: edit, changes}
+        API->>API: apply_changes check (422 on a bad edit)
+        WF->>ENG: estimate → schedule → recommend, back to pm_review (revision + 1)
+    else approve
+        UI->>API: POST /workflows/{id}/resume {action: approve}
+        WF->>DB: project, epics, tasks, dependencies, assignments + audit rows
+        API-->>UI: SSE run: committed → link to the project
+    else reject (reason)
+        WF-->>UI: run: rejected, nothing written
+    end
+```
+
+## One P(on time) everywhere
+
+`services/scenario.py` loads a project's engine inputs once and evaluates them: CPM, the baseline and remaining-work schedules, the resource-adjusted Monte Carlo forecast and the risk findings. `GET /forecast`, `GET /metrics`, the risk register and every reallocation proposal (before / now / if approved) all go through it, at the project's clock (`sim_date`, else today). So every page and every proposal shows the same probability.
