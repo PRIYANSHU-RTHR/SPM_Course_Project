@@ -32,7 +32,7 @@ export function ExplanationBlock({ projectId, taskId, mode }: ExplanationBlockPr
       ) : (
         <p className="mt-1 text-muted-foreground">
           {unavailable
-            ? 'Explanations are not available on this API yet. The numbers above come from the engine.'
+            ? 'No explanation for this task. The numbers above come from the engine.'
             : explanation.error?.message}
         </p>
       )}
