@@ -56,3 +56,21 @@ def test_step_24_read_endpoints_are_documented() -> None:
     metrics = paths["/projects/{project_id}/metrics"]["get"]
     assert metrics["operationId"] == "metrics_get"
     assert "summary" in spec["components"]["schemas"]["AuditRead"]["required"]
+
+
+def test_plan_example_is_the_recorded_demo_brief() -> None:
+    from datetime import date
+
+    from fastapi.testclient import TestClient
+
+    from app.agents.planning import DEMO_BRIEF
+    from app.services.workflows import example_plan
+
+    plan = example_plan(date(2026, 11, 10))  # a Tuesday
+    assert plan.brief == DEMO_BRIEF.read_text(encoding="utf-8")
+    assert (plan.start_date, plan.deadline) == (date(2026, 11, 16), date(2027, 3, 5))
+    assert plan.start_date.weekday() == 0 and plan.deadline.weekday() == 4
+
+    body = TestClient(create_app(Settings(_env_file=None))).get("/workflows/plan/example").json()  # type: ignore[call-arg]
+    assert body["brief"] == plan.brief
+    assert body["project_name"] == "Campus Food-Ordering App v2"
