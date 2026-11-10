@@ -55,3 +55,20 @@ export type WorkflowEvent =
   paths['/workflows/{thread_id}/events']['get']['responses'][200]['content']['text/event-stream']
 export type WorkflowStatus = WorkflowState['status']
 export type SkillPage = Schemas['SkillPage']
+
+// Disruptions, reallocation proposals, simulated clock, audit (Step 24)
+export type LeaveDisruption = Schemas['LeaveDisruption']
+export type SlipDisruption = Schemas['SlipDisruption']
+export type ScopeAddDisruption = Schemas['ScopeAddDisruption']
+export type Disruption = LeaveDisruption | SlipDisruption | ScopeAddDisruption
+export type DisruptionStarted = Schemas['DisruptionStarted']
+export type Proposal = Schemas['ReallocationRead']
+export type ProposalPage = Schemas['ReallocationPage']
+export type ProposalPayload = Schemas['ProposalPayload']
+export type ProposalItem = Schemas['ProposalItem']
+export type ScenarioMetrics = Schemas['ScenarioMetrics']
+export type RiskRef = Schemas['RiskRef']
+export type ProjectMetrics = Schemas['ProjectMetrics']
+export type AdvanceResult = Schemas['AdvanceResult']
+export type AuditEntry = Schemas['AuditRead']
+export type AuditPage = Schemas['AuditPage']
