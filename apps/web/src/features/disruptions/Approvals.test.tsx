@@ -75,6 +75,7 @@ describe('ApprovalsPage', () => {
     expect(within(card).getByText('Diya Nair')).toBeTruthy()
     expect(within(card).getByText('owner away')).toBeTruthy()
     expect(within(card).getByText('Only Aarav can do T-012')).toBeTruthy()
+    expect(within(card).queryByText(/Approving finishes later/)).toBeNull() // Dec 10 < Dec 23
     // History: the rejected slip, with who and why.
     expect(screen.getByText('T-012 Payment gateway integration needs 16 h more')).toBeTruthy()
     expect(screen.getByText('“Back early”')).toBeTruthy()
@@ -129,6 +130,19 @@ describe('ApprovalsPage', () => {
     expect(screen.getByText('Record disruption')).toBeTruthy()
     expect(screen.getByText('leave recorded; 1 open task affected')).toBeTruthy()
     expect(screen.getByText('The engines are computing a proposal.')).toBeTruthy()
+  })
+  it('warns when approving would finish later than doing nothing', async () => {
+    const later = {
+      ...PENDING,
+      payload: {
+        ...PENDING.payload!,
+        if_approved: { ...PENDING.payload!.if_approved, finish: '2026-12-25' },
+      },
+    }
+    mockApi({ ...BASE, 'GET /projects/1/proposals?limit=20': { ...PROPOSALS, items: [later] } })
+    renderAt('/approvals')
+
+    expect(await screen.findByText(/Approving finishes later \(25 Dec\)/)).toBeTruthy()
   })
 })
 
