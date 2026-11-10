@@ -1,4 +1,10 @@
-export const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:8000').replace(/\/$/, '')
+/** Runtime config (`/config.js`, written by the container) wins over the build-time value. */
+function resolveApiUrl(): string {
+  const runtime = typeof window === 'undefined' ? undefined : window.__ORCHESTRAI_CONFIG__?.apiUrl
+  return (runtime || import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '')
+}
+
+export const API_URL = resolveApiUrl()
 
 interface ErrorBody {
   error?: { code?: string; message?: string; details?: Record<string, unknown> }
