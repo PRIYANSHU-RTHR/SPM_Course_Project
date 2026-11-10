@@ -21,6 +21,7 @@ export const PROJECT: Project = {
   deadline: '2026-12-18',
   budget: '1500000.00',
   hourly_rate: '1250.00',
+  sim_date: null,
   created_at: STAMP,
   updated_at: STAMP,
 }

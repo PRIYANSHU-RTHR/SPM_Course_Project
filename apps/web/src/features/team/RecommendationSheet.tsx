@@ -15,7 +15,6 @@ import { CandidateCard } from './CandidateCard'
 import { ExplanationBlock } from './ExplanationBlock'
 import { type AssignmentRow, toBreakdown } from './teamMetrics'
 
-const ACTOR = 'PM'
 
 interface RecommendationSheetProps {
   projectId: number
@@ -49,7 +48,6 @@ export function RecommendationSheet({
     if (recommended === undefined) return
     apply.mutate(
       {
-        actor: ACTOR,
         items: [
           {
             task_id: task.id,
@@ -68,7 +66,6 @@ export function RecommendationSheet({
     const candidate = recommendation?.candidates.find((item) => item.member_id === chosen)
     apply.mutate(
       {
-        actor: ACTOR,
         items: [
           {
             task_id: task.id,

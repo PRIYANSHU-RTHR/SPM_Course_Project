@@ -384,8 +384,31 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Apply */
+        /**
+         * Apply
+         * @description PM override or bulk apply; one audit row per assignment, actor from `X-Actor`.
+         */
         post: operations["assignment_apply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/assignments/{task_id}/explain": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Explain
+         * @description Why the engine recommends this member; model text only if every number is grounded.
+         */
+        get: operations["assignment_explain"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -483,10 +506,289 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{project_id}/risks/{risk_id}/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Plan
+         * @description Generate and store the RMMM plan (mitigation, monitoring trigger, contingency, owner).
+         */
+        post: operations["risks_plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workflows/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Plan
+         * @description Start brief -> WBS -> estimates -> schedule -> owners; it pauses for PM review.
+         */
+        post: operations["workflows_start_plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workflows/plan/example": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Plan Example
+         * @description The demo brief with default dates and budget, to prefill the new-project form. With
+         *     LLM_MODE=fixture this is the brief that has a recorded plan.
+         */
+        get: operations["workflows_plan_example"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workflows/{thread_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Events
+         * @description Past events, then live ones; the stream ends when the run is committed, rejected or
+         *     failed. Reconnecting clients send `Last-Event-ID` to skip what they already have.
+         */
+        get: operations["workflows_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workflows/{thread_id}/state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get State
+         * @description Status, current node, and what the PM must decide on while waiting
+         *     (`kind` = plan: `review`; `kind` = reallocate: `proposal`).
+         */
+        get: operations["workflows_get_state"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workflows/{thread_id}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resume
+         * @description Plan: approve -> commit; edit -> re-estimate and review again; reject -> end.
+         *     Reallocation: approve -> apply new owners; reject (reason required) -> owners unchanged.
+         */
+        post: operations["workflows_resume"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/disruptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Disruption
+         * @description Record the disruption (leave, slip, new scope) and start the reallocation run. Its
+         *     proposal appears under `/proposals?status=pending`; decide with `/workflows/{id}/resume`.
+         */
+        post: operations["reallocation_create_disruption"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Proposals
+         * @description Reallocation proposals, newest first.
+         */
+        get: operations["reallocation_list_proposals"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/proposals/{thread_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Proposal
+         * @description One proposal with its full diff: per-task owner/score/finish before and after,
+         *     before-disruption / now / if-approved metrics, and risks that would close or open.
+         *     404 until the run has reached its proposal (follow `/workflows/{thread_id}/events`).
+         */
+        get: operations["reallocation_get_proposal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/simulate/advance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Advance
+         * @description Move the project's simulated "today" forward; generate progress and one snapshot per
+         *     working day (seeded by SIM_SEED), then recompute EVM and the risk register.
+         */
+        post: operations["simulation_advance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List
+         * @description Every audited change to the project, its tasks, assignments, risks and proposals,
+         *     newest first, each with a one-line human-readable `summary`.
+         */
+        get: operations["audit_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get
+         * @description P(on time), P50/P80 finish, SPI, CPI, open risks and overloaded members at the
+         *     project's clock. All engine output; refetch after an approval to get the "after" values.
+         */
+        get: operations["metrics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AdvanceResult */
+        AdvanceResult: {
+            /** Project Id */
+            project_id: number;
+            /**
+             * From Date
+             * Format: date
+             */
+            from_date: string;
+            /**
+             * To Date
+             * Format: date
+             */
+            to_date: string;
+            /** Working Days */
+            working_days: number;
+            /**
+             * Snapshots
+             * @description Snapshot rows written (one per working day)
+             */
+            snapshots: number;
+            /** Spi */
+            spi: number | null;
+            /** Cpi */
+            cpi: number | null;
+            /** P On Time */
+            p_on_time: number | null;
+            risks: components["schemas"]["RiskRefreshResult"];
+        };
         /** AppliedAssignment */
         AppliedAssignment: {
             /** Assignment Id */
@@ -516,10 +818,18 @@ export interface components {
         };
         /** ApplyRequest */
         ApplyRequest: {
-            /** Actor */
-            actor: string;
             /** Items */
             items: components["schemas"]["ApplyItem"][];
+        };
+        /** ApproveDecision */
+        ApproveDecision: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            action: "approve";
+            /** Reason */
+            reason?: string | null;
         };
         /** AssignmentRead */
         AssignmentRead: {
@@ -549,6 +859,50 @@ export interface components {
          * @enum {string}
          */
         AssignmentSource: "ai" | "pm_override";
+        /** AuditPage */
+        AuditPage: {
+            /** Items */
+            items: components["schemas"]["AuditRead"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** AuditRead */
+        AuditRead: {
+            /** Id */
+            id: number;
+            /** Actor */
+            actor: string;
+            /** Action */
+            action: string;
+            /** Entity */
+            entity: string;
+            /** Entity Id */
+            entity_id: number;
+            /** Before */
+            before: {
+                [key: string]: unknown;
+            } | null;
+            /** After */
+            after: {
+                [key: string]: unknown;
+            } | null;
+            /** Reason */
+            reason: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Summary
+             * @description One readable line built from this row and the names it refers to
+             */
+            summary: string;
+        };
         /**
          * AvailabilityCreate
          * @description `work` needs hours_per_week; `leave` is always 0 h/week (may be omitted).
@@ -594,6 +948,15 @@ export interface components {
             hours_per_week: number;
             /** Note */
             note: string | null;
+        };
+        /** CandidateBrief */
+        CandidateBrief: {
+            /** Member Id */
+            member_id: number;
+            /** Name */
+            name: string;
+            /** Total */
+            total: number;
         };
         /** CandidateOut */
         CandidateOut: {
@@ -728,6 +1091,23 @@ export interface components {
          * @enum {string}
          */
         DependencyType: "FS";
+        /** DisruptionStarted */
+        DisruptionStarted: {
+            /** Thread Id */
+            thread_id: string;
+            /** Project Id */
+            project_id: number;
+        };
+        /** EditDecision */
+        EditDecision: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            action: "edit";
+            /** Changes */
+            changes: components["schemas"]["TaskChange"][];
+        };
         /** EpicCreate */
         EpicCreate: {
             /** Title */
@@ -818,6 +1198,28 @@ export interface components {
             /** Ac */
             ac: string | null;
         };
+        /** Explanation */
+        Explanation: {
+            /** Recommended Member Id */
+            recommended_member_id: number | null;
+            /** Text */
+            text: string;
+            /**
+             * Grounded
+             * @description True when the model's text passed the number check
+             */
+            grounded: boolean;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "model" | "template";
+            /**
+             * Ungrounded
+             * @description Numbers that failed
+             */
+            ungrounded?: string[];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -843,6 +1245,31 @@ export interface components {
             member_id: number;
             /** Reason */
             reason: string;
+        };
+        /**
+         * LeaveDisruption
+         * @description A member is unavailable for an inclusive date range.
+         */
+        LeaveDisruption: {
+            /** Reason */
+            reason?: string | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "leave";
+            /** Member Id */
+            member_id: number;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
         };
         /** MemberCreate */
         MemberCreate: {
@@ -929,6 +1356,13 @@ export interface components {
             /** Email */
             email?: string | null;
         };
+        /** OwnerRef */
+        OwnerRef: {
+            /** Member Id */
+            member_id: number | null;
+            /** Name */
+            name: string | null;
+        };
         /** Percentile */
         Percentile: {
             /** Hours */
@@ -939,6 +1373,234 @@ export interface components {
              * @description Working day on which that many hours are reached
              */
             on: string;
+        };
+        /** PlanEstimates */
+        PlanEstimates: {
+            /**
+             * Total Te Hours
+             * @description Sum of task te (effort, not duration)
+             */
+            total_te_hours: number;
+            /**
+             * Total Std Hours
+             * @description sqrt of summed task variances
+             */
+            total_std_hours: number;
+            /**
+             * Total Effort Pm
+             * @description total_te_hours / 152
+             */
+            total_effort_pm: number;
+            /**
+             * Estimated Cost
+             * @description total_te_hours x hourly_rate, INR
+             */
+            estimated_cost: string;
+            /** Budget */
+            budget: string;
+            cocomo: components["schemas"]["Cocomo"] | null;
+            /** Tasks */
+            tasks: components["schemas"]["TaskEstimate"][];
+        };
+        /** PlanRecommendation */
+        PlanRecommendation: {
+            /** Task Id */
+            task_id: string;
+            /**
+             * Member Id
+             * @description null = nobody eligible
+             */
+            member_id: number | null;
+            /** Member Name */
+            member_name: string | null;
+            score: components["schemas"]["ScoreOut"] | null;
+            /**
+             * Candidates
+             * @description Top 3 eligible, best first
+             */
+            candidates: components["schemas"]["CandidateBrief"][];
+            /** Ineligible Count */
+            ineligible_count: number;
+        };
+        /** PlanRecommendations */
+        PlanRecommendations: {
+            /**
+             * Mode
+             * @default optimal
+             * @constant
+             */
+            mode: "optimal";
+            /** Total Score */
+            total_score: number;
+            /** Utilisation Std */
+            utilisation_std: number;
+            /** Unassigned */
+            unassigned: number;
+            /**
+             * Finish With Owners
+             * @description Resource-constrained finish with the recommended owners
+             */
+            finish_with_owners: string | null;
+            /** Items */
+            items: components["schemas"]["PlanRecommendation"][];
+        };
+        /**
+         * PlanReview
+         * @description What the PM sees at the review interrupt.
+         */
+        PlanReview: {
+            /** Thread Id */
+            thread_id: string;
+            /**
+             * Revision
+             * @description 0 = first draft; +1 per applied edit
+             */
+            revision: number;
+            /** Project Name */
+            project_name: string;
+            wbs: components["schemas"]["WBSPlan"];
+            /** Warnings */
+            warnings: string[];
+            estimates: components["schemas"]["PlanEstimates"];
+            schedule: components["schemas"]["PlanSchedule"];
+            recommendations: components["schemas"]["PlanRecommendations"];
+        };
+        /** PlanSchedule */
+        PlanSchedule: {
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+            /**
+             * Finish
+             * Format: date
+             * @description Unassigned plan on the project calendar
+             */
+            finish: string;
+            /**
+             * Deadline
+             * Format: date
+             */
+            deadline: string;
+            /**
+             * Duration Hours
+             * @description CPM project duration
+             */
+            duration_hours: number;
+            /** Meets Deadline */
+            meets_deadline: boolean;
+            /** Critical Path */
+            critical_path: string[];
+            /** Tasks */
+            tasks: components["schemas"]["ScheduledWbsTask"][];
+        };
+        /** PlanStart */
+        "PlanStart-Input": {
+            /**
+             * Brief
+             * @description Project brief in prose
+             */
+            brief: string;
+            /** Project Name */
+            project_name: string;
+            /**
+             * Deadline
+             * Format: date
+             */
+            deadline: string;
+            /**
+             * Budget
+             * @description INR
+             */
+            budget: number | string;
+            /**
+             * Start Date
+             * @description Default: the next working day (UTC)
+             */
+            start_date?: string | null;
+            /**
+             * Hourly Rate
+             * @description INR
+             * @default 850.00
+             */
+            hourly_rate: number | string;
+        };
+        /** PlanStart */
+        "PlanStart-Output": {
+            /**
+             * Brief
+             * @description Project brief in prose
+             */
+            brief: string;
+            /** Project Name */
+            project_name: string;
+            /**
+             * Deadline
+             * Format: date
+             */
+            deadline: string;
+            /**
+             * Budget
+             * @description INR
+             */
+            budget: string;
+            /**
+             * Start Date
+             * @description Default: the next working day (UTC)
+             */
+            start_date?: string | null;
+            /**
+             * Hourly Rate
+             * @description INR
+             * @default 850.00
+             */
+            hourly_rate: string;
+        };
+        /** PlanStarted */
+        PlanStarted: {
+            /** Thread Id */
+            thread_id: string;
+        };
+        /** PlannedEpic */
+        PlannedEpic: {
+            /** Local Id */
+            local_id: string;
+            /** Title */
+            title: string;
+            /** Tasks */
+            tasks: components["schemas"]["PlannedTask"][];
+        };
+        /** PlannedTask */
+        PlannedTask: {
+            /** Local Id */
+            local_id: string;
+            /** Title */
+            title: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Required Skills */
+            required_skills?: components["schemas"]["SkillReq"][];
+            /**
+             * O
+             * @description optimistic hours
+             */
+            o: number;
+            /**
+             * M
+             * @description most likely hours
+             */
+            m: number;
+            /**
+             * P
+             * @description pessimistic hours
+             */
+            p: number;
+            /** Predecessors */
+            predecessors?: string[];
         };
         /** ProjectCpm */
         ProjectCpm: {
@@ -1118,6 +1780,57 @@ export interface components {
             /** Assignments */
             assignments: components["schemas"]["AssignmentRead"][];
         };
+        /** ProjectMetrics */
+        ProjectMetrics: {
+            /** Project Id */
+            project_id: number;
+            /**
+             * As Of
+             * Format: date
+             * @description The project's clock (`sim_date`, else today)
+             */
+            as_of: string;
+            /**
+             * Deadline
+             * Format: date
+             */
+            deadline: string;
+            /**
+             * P On Time
+             * @description Resource-adjusted Monte Carlo P(finish <= deadline), 0..1; same computation as the reallocation proposal's `now` / `if_approved`
+             */
+            p_on_time: number | null;
+            /**
+             * P50
+             * @description Median finish date (Monte Carlo)
+             */
+            p50: string | null;
+            /**
+             * P80
+             * @description 80th-percentile finish date (Monte Carlo)
+             */
+            p80: string | null;
+            /**
+             * Spi
+             * @description Schedule performance index EV / PV
+             */
+            spi: number | null;
+            /**
+             * Cpi
+             * @description Cost performance index EV / AC
+             */
+            cpi: number | null;
+            /**
+             * Open Risks
+             * @description Risks the rules raise right now (open register rows)
+             */
+            open_risks: number;
+            /**
+             * Overloaded Members
+             * @description Members booked above capacity in at least one week (member_overload rule)
+             */
+            overloaded_members: number;
+        };
         /** ProjectPage */
         ProjectPage: {
             /** Items */
@@ -1151,6 +1864,11 @@ export interface components {
             budget: string;
             /** Hourly Rate */
             hourly_rate: string;
+            /**
+             * Sim Date
+             * @description Simulated today (demo clock); null = real date
+             */
+            sim_date: string | null;
             /**
              * Created At
              * Format: date-time
@@ -1206,6 +1924,156 @@ export interface components {
             /** Hourly Rate */
             hourly_rate?: number | string | null;
         };
+        /** ProposalItem */
+        ProposalItem: {
+            /** Task Id */
+            task_id: number;
+            /** Title */
+            title: string;
+            /** Reasons */
+            reasons: ("owner_unavailable" | "critical_slip" | "new_scope")[];
+            before: components["schemas"]["OwnerRef"];
+            after: components["schemas"]["OwnerRef"];
+            /**
+             * Changed
+             * @description False = keep the current owner (nobody better/eligible)
+             */
+            changed: boolean;
+            /** Before Eligible */
+            before_eligible: boolean;
+            /** Before Ineligible Reason */
+            before_ineligible_reason: string | null;
+            /**
+             * Score Before
+             * @description Assignment score of the current owner now
+             */
+            score_before: number | null;
+            /** Score After */
+            score_after: number | null;
+            /**
+             * Finish Before
+             * @description Planned finish with current owners
+             */
+            finish_before: string | null;
+            /**
+             * Finish After
+             * @description Planned finish if the proposal is approved
+             */
+            finish_after: string | null;
+        };
+        /** ProposalPayload */
+        ProposalPayload: {
+            /** Reallocation Id */
+            reallocation_id: number;
+            /** Thread Id */
+            thread_id: string;
+            /** Project Id */
+            project_id: number;
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Disruption */
+            disruption: {
+                [key: string]: unknown;
+            };
+            /**
+             * Summary
+             * @description Template sentence from the numbers below (no LLM)
+             */
+            summary: string;
+            before_disruption: components["schemas"]["ScenarioMetrics"];
+            /** @description Disruption applied, current owners */
+            now: components["schemas"]["ScenarioMetrics"];
+            /** @description Disruption applied, proposed owners */
+            if_approved: components["schemas"]["ScenarioMetrics"];
+            /** Items */
+            items: components["schemas"]["ProposalItem"][];
+            /** Risks That Would Close */
+            risks_that_would_close: components["schemas"]["RiskRef"][];
+            /** Risks That Would Open */
+            risks_that_would_open: components["schemas"]["RiskRef"][];
+        };
+        /** ReallocationPage */
+        ReallocationPage: {
+            /** Items */
+            items: components["schemas"]["ReallocationRead"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** ReallocationRead */
+        ReallocationRead: {
+            /** Id */
+            id: number;
+            /** Project Id */
+            project_id: number;
+            /** Thread Id */
+            thread_id: string;
+            /** Disruption */
+            disruption: {
+                [key: string]: unknown;
+            };
+            payload: components["schemas"]["ProposalPayload"] | null;
+            status: components["schemas"]["ReallocationStatus"];
+            /** Decided By */
+            decided_by: string | null;
+            /** Reason */
+            reason: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Decided At */
+            decided_at: string | null;
+        };
+        /**
+         * ReallocationState
+         * @description GET /workflows/{thread_id}/state for a reallocation run.
+         */
+        ReallocationState: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "reallocate";
+            /** Thread Id */
+            thread_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "waiting" | "committed" | "rejected" | "failed";
+            /** Node */
+            node: string | null;
+            /** Project Id */
+            project_id: number;
+            /** Reallocation Id */
+            reallocation_id: number | null;
+            /** @description Set while waiting for the PM */
+            proposal: components["schemas"]["ProposalPayload"] | null;
+            /** @description Recomputed after an approval */
+            outcome: components["schemas"]["ScenarioMetrics"] | null;
+            /**
+             * Applied
+             * @description Assignment ids written on approval
+             */
+            applied: number[];
+            /** Reason */
+            reason: string | null;
+            /** Error */
+            error: string | null;
+        };
+        /**
+         * ReallocationStatus
+         * @enum {string}
+         */
+        ReallocationStatus: "pending" | "approved" | "rejected" | "failed";
         /** RecommendResponse */
         RecommendResponse: {
             /** Project Id */
@@ -1254,6 +2122,16 @@ export interface components {
             /** Ineligible */
             ineligible: components["schemas"]["Ineligible"][];
         };
+        /** RejectDecision */
+        RejectDecision: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            action: "reject";
+            /** Reason */
+            reason: string;
+        };
         /** RequiredSkill */
         RequiredSkill: {
             /**
@@ -1268,6 +2146,16 @@ export interface components {
              * @default true
              */
             must: boolean;
+        };
+        /** ResumeAccepted */
+        ResumeAccepted: {
+            /** Thread Id */
+            thread_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "waiting" | "committed" | "rejected" | "failed";
         };
         /**
          * RiskCategory
@@ -1335,6 +2223,22 @@ export interface components {
              */
             readonly score: number;
         };
+        /** RiskRef */
+        RiskRef: {
+            /**
+             * Risk Id
+             * @description Register row, if the risk is in the register
+             */
+            risk_id: number | null;
+            /** Rule Key */
+            rule_key: string;
+            /** Subject Ref */
+            subject_ref: string;
+            /** Title */
+            title: string;
+            /** Score */
+            score: number;
+        };
         /** RiskRefreshResult */
         RiskRefreshResult: {
             /**
@@ -1373,6 +2277,34 @@ export interface components {
          * @enum {string}
          */
         RiskStatus: "open" | "mitigating" | "closed";
+        /**
+         * ScenarioMetrics
+         * @description Engine output for one what-if. Dates are on the project's working calendar.
+         */
+        ScenarioMetrics: {
+            /**
+             * P On Time
+             * @description Resource-adjusted Monte Carlo P(finish <= deadline)
+             */
+            p_on_time: number | null;
+            /** P50 */
+            p50: string | null;
+            /** P80 */
+            p80: string | null;
+            /** P80 Hours */
+            p80_hours: number | null;
+            /**
+             * Finish
+             * Format: date
+             * @description Resource-constrained schedule finish (remaining work)
+             */
+            finish: string;
+            /**
+             * Resource Shift Hours
+             * @description Resource-constrained finish minus the unconstrained network finish (h); added to every Monte Carlo run
+             */
+            resource_shift_hours: number;
+        };
         /** ScheduledTaskOut */
         ScheduledTaskOut: {
             /** Task Id */
@@ -1402,6 +2334,44 @@ export interface components {
              * @description Working days later than early_start
              */
             resource_delay_days: number;
+        };
+        /** ScheduledWbsTask */
+        ScheduledWbsTask: {
+            /** Task Id */
+            task_id: string;
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+            /**
+             * End
+             * Format: date
+             */
+            end: string;
+            /** Total Slack Hours */
+            total_slack_hours: number;
+            /** Critical */
+            critical: boolean;
+        };
+        /**
+         * ScopeAddDisruption
+         * @description New work enters the project mid-flight.
+         */
+        ScopeAddDisruption: {
+            /** Reason */
+            reason?: string | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "scope_add";
+            task: components["schemas"]["TaskCreate"];
+            /**
+             * Predecessors
+             * @description Task ids in this project
+             */
+            predecessors?: number[];
         };
         /** ScoreOut */
         ScoreOut: {
@@ -1479,10 +2449,72 @@ export interface components {
              */
             created_at: string;
         };
+        /** SkillReq */
+        SkillReq: {
+            /** Skill */
+            skill: string;
+            /**
+             * Level
+             * @description 1-5; 3 = can do it alone, 5 = expert
+             */
+            level: number;
+            /**
+             * Must
+             * @default true
+             */
+            must: boolean;
+        };
         /** SkillUpdate */
         SkillUpdate: {
             /** Name */
             name?: string | null;
+        };
+        /**
+         * SlipDisruption
+         * @description A task needs more effort than estimated: o, m and p all grow by `extra_hours`.
+         */
+        SlipDisruption: {
+            /** Reason */
+            reason?: string | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "slip";
+            /** Task Id */
+            task_id: number;
+            /** Extra Hours */
+            extra_hours: number;
+        };
+        /**
+         * TaskChange
+         * @description `update` sets only the fields given; `remove` deletes the task and links to it.
+         */
+        TaskChange: {
+            /**
+             * Op
+             * @enum {string}
+             */
+            op: "update" | "remove";
+            /**
+             * Task Id
+             * @description WBS id, e.g. T-004
+             */
+            task_id: string;
+            /** Title */
+            title?: string | null;
+            /** Description */
+            description?: string | null;
+            /** O */
+            o?: number | null;
+            /** M */
+            m?: number | null;
+            /** P */
+            p?: number | null;
+            /** Required Skills */
+            required_skills?: components["schemas"]["SkillReq"][] | null;
+            /** Predecessors */
+            predecessors?: string[] | null;
         };
         /** TaskCreate */
         TaskCreate: {
@@ -1505,6 +2537,21 @@ export interface components {
             priority: number;
             /** Required Skills */
             required_skills?: components["schemas"]["RequiredSkill"][];
+        };
+        /** TaskEstimate */
+        TaskEstimate: {
+            /** Task Id */
+            task_id: string;
+            /**
+             * Te Hours
+             * @description (o + 4m + p) / 6
+             */
+            te_hours: number;
+            /**
+             * Std Hours
+             * @description (p - o) / 6
+             */
+            std_hours: number;
         };
         /** TaskPage */
         TaskPage: {
@@ -1617,6 +2664,13 @@ export interface components {
             /** Context */
             ctx?: Record<string, never>;
         };
+        /** WBSPlan */
+        WBSPlan: {
+            /** Epics */
+            epics: components["schemas"]["PlannedEpic"][];
+            /** Assumptions */
+            assumptions?: string[];
+        };
         /** WeekLoadOut */
         WeekLoadOut: {
             /** Member Id */
@@ -1636,6 +2690,45 @@ export interface components {
              * @description hours / capacity; 0 when capacity is 0
              */
             utilisation: number;
+        };
+        /** WorkflowState */
+        WorkflowState: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "plan";
+            /** Thread Id */
+            thread_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "waiting" | "committed" | "rejected" | "failed";
+            /**
+             * Node
+             * @description Running: node in progress. Waiting: pm_review
+             */
+            node: string | null;
+            /** Revision */
+            revision: number;
+            /** @description Set while waiting for the PM */
+            review: components["schemas"]["PlanReview"] | null;
+            /**
+             * Project Id
+             * @description Set once committed
+             */
+            project_id: number | null;
+            /**
+             * Reason
+             * @description Rejection reason
+             */
+            reason: string | null;
+            /**
+             * Error
+             * @description Why the run failed
+             */
+            error: string | null;
         };
     };
     responses: never;
@@ -3112,7 +4205,10 @@ export interface operations {
     assignment_apply: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Who is acting; recorded as `audit_log.actor` */
+                "X-Actor"?: string;
+            };
             path: {
                 project_id: number;
             };
@@ -3144,9 +4240,46 @@ export interface operations {
             };
         };
     };
+    assignment_explain: {
+        parameters: {
+            query?: {
+                mode?: "greedy" | "optimal";
+            };
+            header?: never;
+            path: {
+                project_id: number;
+                task_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Explanation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     schedule_get: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Plan remaining work from this date (default: the project's clock) */
+                as_of?: string | null;
+            };
             header?: never;
             path: {
                 project_id: number;
@@ -3211,7 +4344,7 @@ export interface operations {
     evm_get: {
         parameters: {
             query?: {
-                /** @description Status date (default: today, UTC) */
+                /** @description Status date (default: the project's clock) */
                 as_of?: string | null;
             };
             header?: never;
@@ -3292,7 +4425,7 @@ export interface operations {
     risks_refresh: {
         parameters: {
             query?: {
-                /** @description Status date (default: today, UTC) */
+                /** @description Status date (default: the project's clock) */
                 as_of?: string | null;
             };
             header?: never;
@@ -3323,6 +4456,539 @@ export interface operations {
             };
             /** @description Conflict */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    risks_plan: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Who is acting; recorded as `audit_log.actor` */
+                "X-Actor"?: string;
+            };
+            path: {
+                project_id: number;
+                risk_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    workflows_start_plan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanStart-Input"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanStarted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    workflows_plan_example: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanStart-Output"];
+                };
+            };
+        };
+    };
+    workflows_events: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Last-Event-ID"?: number;
+            };
+            path: {
+                thread_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Server-sent events; each `data` is a WorkflowEvent as JSON */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": {
+                        /** Seq */
+                        seq: number;
+                        /** Thread Id */
+                        thread_id: string;
+                        /**
+                         * Type
+                         * @enum {string}
+                         */
+                        type: "node" | "run";
+                        /** Node */
+                        node?: string | null;
+                        /** Phase */
+                        phase?: ("start" | "end") | null;
+                        /** Status */
+                        status?: ("running" | "waiting" | "committed" | "rejected" | "failed") | null;
+                        /** Duration Ms */
+                        duration_ms?: number | null;
+                        /**
+                         * Summary
+                         * @default
+                         */
+                        summary: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    workflows_get_state: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                thread_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkflowState"] | components["schemas"]["ReallocationState"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    workflows_resume: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Who is acting; recorded as `audit_log.actor` */
+                "X-Actor"?: string;
+            };
+            path: {
+                thread_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApproveDecision"] | components["schemas"]["EditDecision"] | components["schemas"]["RejectDecision"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumeAccepted"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reallocation_create_disruption: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Who is acting; recorded as `audit_log.actor` */
+                "X-Actor"?: string;
+            };
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeaveDisruption"] | components["schemas"]["SlipDisruption"] | components["schemas"]["ScopeAddDisruption"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DisruptionStarted"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reallocation_list_proposals: {
+        parameters: {
+            query?: {
+                /** @description Filter by status */
+                status?: components["schemas"]["ReallocationStatus"] | null;
+                /** @description Page size */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReallocationPage"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reallocation_get_proposal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+                thread_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReallocationRead"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulation_advance: {
+        parameters: {
+            query: {
+                /** @description Calendar days to move forward */
+                days: number;
+            };
+            header?: {
+                /** @description Who is acting; recorded as `audit_log.actor` */
+                "X-Actor"?: string;
+            };
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdvanceResult"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    audit_list: {
+        parameters: {
+            query?: {
+                /** @description Page size */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditPage"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectMetrics"];
+                };
+            };
+            /** @description Not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
