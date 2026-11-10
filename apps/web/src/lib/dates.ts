@@ -52,6 +52,11 @@ export function addWorkingDays(date: string, days: number): string {
   return day
 }
 
+/** The day a task finishes when it ends `hours` of project time after `start`. */
+export function dateAfterHours(start: string, hours: number): string {
+  return addWorkingDays(start, Math.max(Math.ceil(hours / HOURS_PER_DAY - 1e-9) - 1, 0))
+}
+
 /** Hours of slack as whole project days, rounded up so any slack is visible. */
 export function slackDays(hours: number): number {
   return Math.max(0, Math.ceil(hours / HOURS_PER_DAY - 1e-9))

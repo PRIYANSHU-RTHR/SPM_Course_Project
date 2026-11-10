@@ -8,6 +8,7 @@ import type {
   ProjectFull,
   ProjectPage,
   ProjectSchedule,
+  Risk,
   RiskPage,
   RiskRefreshResult,
 } from '@/lib/api/schemas'
@@ -44,6 +45,20 @@ export const useSchedule = (id: number | undefined) =>
   useProjectResource<ProjectSchedule>(id, 'schedule')
 export const useRisks = (id: number | undefined) =>
   useProjectResource<RiskPage>(id, 'risks?limit=200')
+
+export function useGenerateRiskPlan(projectId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (riskId: number) =>
+      apiFetch<Risk>(`/projects/${projectId}/risks/${riskId}/plan`, { method: 'POST' }),
+    onSuccess: (risk) =>
+      queryClient.setQueryData<RiskPage>(['projects', projectId, 'risks?limit=200'], (page) =>
+        page
+          ? { ...page, items: page.items.map((item) => (item.id === risk.id ? risk : item)) }
+          : page,
+      ),
+  })
+}
 
 export function useRefreshRisks(projectId: number) {
   const queryClient = useQueryClient()
