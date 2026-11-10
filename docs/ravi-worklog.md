@@ -12,8 +12,8 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 |---|---|---|---|
 | 18 | Web scaffold and design system | Merged | Nothing |
 | 04 | Seed data | Merged | Nothing |
-| 19 | Projects list and overview | Done, on `feat/19-overview`, no PR yet | PR and review |
-| 21 | Network graph and Gantt | Next | Step 19 merged. Real data is ready |
+| 19 | Projects list and overview | Done, in [PR #5](https://github.com/PRIYANSHU-RTHR/SPM_Course_Project/pull/5), not merged | PR review by a teammate |
+| 21 | Network graph and Gantt | Done, on `feat/21-network-gantt`, no PR yet | PR after PR #5 merges |
 | 23 | Risk, EVM and forecast views | Ready after 19 | AI plans need Step 16 merged |
 | 22 | Team and assignment views | Ready after 19 | AI explanations need Step 16 merged |
 | 20 | New project flow | Not started | Mock stream until Step 15 exists |
@@ -29,9 +29,10 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 
 ## Next actions
 
-1. Open a PR for Step 19 and get it reviewed.
+1. Get PR #5 (Step 19) reviewed and merged.
 2. Raise the open questions below. The forecast one blocks the demo story.
-3. Start Step 21 on `feat/21-network-gantt`, branched from `main` after Step 19 merges.
+3. Open the Step 21 PR once Step 19 is on `main`.
+4. Start Step 23 next. Its real data is ready, apart from the AI plans in Step 16.
 
 ## Work done
 
@@ -101,11 +102,32 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 - An empty project shows no metrics. The forecast engine reports 100% on time for it, which would mislead.
 - Recharts loads only on pages with a chart.
 
+### Step 21 · Network graph and Gantt (2026-11-06)
+
+**Built**
+
+- `/projects/:id/schedule` with Network and Gantt tabs, on real data.
+- Network: dependency graph with the critical path highlighted and a critical-only toggle.
+- Gantt: grouped by epic, owner colours, hatched slack, today and deadline lines, weekend shading, Day and Week zoom, and dependency lines on hover.
+- Task details open from either view.
+- The header shows when the finish is past the deadline: currently 4 working days.
+
+**Checked**
+
+- Typecheck, lint, 45 web tests and build pass.
+- Tested on real data at 1440px and 390px, including an empty project and a missing project.
+- Only tested with 25 tasks, not the 50 in the brief.
+
+**Decisions**
+
+- Branched from Step 19, because Step 21 builds on it and PR #5 is still waiting.
+- The network opens at a readable zoom instead of fitting everything.
+- Added a deadline line, which the brief did not ask for, so the overrun is visible.
+
 ## Future requirements
 
 ### For my next steps
 
-- **Step 21:** build the dependency network and Gantt. It will show the 7 December finish next to 82% on time.
 - **After Step 17:** retune the seed so "Bob on leave" lands near the plan.md §4 numbers: 47%, then about 74% after approval.
 - **Step 23:** add `/projects/:id/control` and decide where it sits in the left rail.
 - **Step 27:** add the `g p` and `?` shortcuts, and fix the 543 kB main JS chunk with route-level code splitting.
