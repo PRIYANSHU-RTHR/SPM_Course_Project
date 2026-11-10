@@ -141,3 +141,28 @@ def test_late_task_slips_past_the_baseline() -> None:
     # 16 h task planned Mon-Tue, only 25% done on Wednesday: 12 h left -> Wed + half of Thu.
     result = schedule([_t(1, 16)], {1: 1}, [M1], MON, progress={1: 25}, as_of=WED)
     assert _dates(result) == {1: (MON, THU)}
+
+
+# --- edge cases (Step 25) --------------------------------------------------------------------
+
+
+def test_join_task_waits_for_its_last_predecessor() -> None:
+    # A 8 h (M1, Mon) and B 16 h (M2, Mon-Tue) both feed C: C starts Wed, after B.
+    tasks = [_t(1, 8), _t(2, 16), _t(3, 8, 1, 2)]
+    result = schedule(tasks, {1: 1, 2: 2, 3: 1}, [M1, M2], MON)
+    assert _dates(result)[3] == (WED, WED)
+
+
+def test_task_finished_before_a_monday_as_of_ends_on_friday() -> None:
+    # Baseline: 48 h on M1 runs Mon .. next Mon. Done by next Monday: the window is cut off
+    # on the previous working day, Friday, not on the weekend.
+    result = schedule([_t(1, 48)], {1: 1}, [M1], MON, progress={1: 100}, as_of=NEXT_MON)
+    assert _dates(result) == {1: (MON, FRI)}
+
+
+def test_task_that_can_never_finish_raises() -> None:
+    # Capacity on paper, but on leave past the scheduler's horizon: MAX_DAYS (1825) steps of
+    # one *working* day each, about 7 calendar years.
+    away = MemberInput(1, {}, 40, (LeaveRange(MON, date(2040, 12, 31)),))
+    with pytest.raises(ScheduleError, match="cannot be finished within"):
+        schedule([_t(1, 8)], {1: 1}, [away], MON)

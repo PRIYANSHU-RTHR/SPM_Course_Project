@@ -7,8 +7,15 @@ from typing import Annotated, Literal
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
-# apps/api/app/config.py -> repo root is three levels up from this file's directory.
-_REPO_ROOT_ENV = Path(__file__).resolve().parents[3] / ".env"
+
+def _repo_root_env(config_file: Path) -> Path | None:
+    """`<repo>/.env` for apps/api/app/config.py (three levels above app/). None when the code
+    is installed shallower than that (e.g. /src/app in a container), instead of failing."""
+    parents = config_file.resolve().parents
+    return parents[3] / ".env" if len(parents) > 3 else None
+
+
+_REPO_ROOT_ENV = _repo_root_env(Path(__file__))
 
 LlmMode = Literal["live", "record", "fixture"]
 

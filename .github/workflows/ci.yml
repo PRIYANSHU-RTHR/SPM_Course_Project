@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A newer push to the same branch or PR cancels the run still in progress.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    name: api
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/api
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: orchestrai
+          POSTGRES_PASSWORD: orchestrai
+          POSTGRES_DB: orchestrai
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U orchestrai"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Tests create and drop their own orchestrai_test_* databases on this server.
+      DATABASE_URL: postgresql+psycopg://orchestrai:orchestrai@localhost:5432/orchestrai
+      LLM_MODE: fixture
+      SIM_SEED: "42"
+      # Unreachable Postgres fails the run instead of skipping the database tests.
+      REQUIRE_POSTGRES: "1"
+    steps:
+      - uses: actions/checkout@v7
+
+      # setup-uv publishes no major-version tag, so pin the release.
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
+
+      - name: Install (Python from .python-version, locked deps)
+        run: uv sync --locked
+
+      - name: Ruff lint
+        run: uv run ruff check .
+
+      - name: Ruff format
+        run: uv run ruff format --check .
+
+      - name: Tests with coverage
+        run: uv run pytest -q --cov --cov-report=term
+
+      - name: Engines coverage >= 80%
+        run: uv run coverage report --include='app/engines/*' --fail-under=80
+
+  web:
+    name: web
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v7
+
+      # Version comes from "packageManager" in apps/web/package.json.
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: apps/web/package.json
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Type-check
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build

@@ -156,3 +156,47 @@ def test_optimal_respects_existing_load_and_leaves_it_untouched() -> None:
     assert rec.score is not None
     assert rec.score.total == pytest.approx(100)
     assert busy.committed == {1: [(WEEK, 40)]}  # copied, not modified
+
+
+# --- edge cases (Step 25) --------------------------------------------------------------------
+
+
+def test_load_ignores_work_outside_the_window_and_weekend_only_windows() -> None:
+    load = Load(WEEK)
+    load.add(1, (date(2026, 11, 16), date(2026, 11, 20)), 40)  # the following week
+    load.add(1, (date(2026, 11, 14), date(2026, 11, 15)), 8)  # Sat-Sun: no working days
+    assert load.hours_in(1, WEEK) == 0
+    load.add(1, (date(2026, 11, 12), date(2026, 11, 16)), 24)  # Thu, Fri, Mon: 8 h a day
+    assert load.hours_in(1, WEEK) == pytest.approx(16)  # Thu + Fri fall inside
+
+
+def test_balance_when_a_zero_capacity_member_already_has_work() -> None:
+    # The idle member's utilisation is infinite (8 h booked, 0 capacity), so it is the team
+    # maximum: everyone with finite utilisation keeps full balance, the idle member gets 0.
+    idle = MemberInput(7, {"python": 5}, 0)
+    load = Load(WEEK)
+    load.add(7, WEEK, 8)
+    team = [M1, idle]
+
+    healthy = score(T1, M1, WEEK, 30, load, team)
+    assert healthy.balance == 1.0
+    assert healthy.total == pytest.approx(100)  # skill 1, capacity 1, balance 1
+
+    stuck = score(T1, idle, WEEK, 30, load, team)
+    assert (stuck.capacity_fit, stuck.balance) == (0.0, 0.0)
+    assert stuck.total == pytest.approx(60)  # skill part only
+
+
+def test_optimal_retries_tasks_the_hungarian_pairs_with_an_ineligible_member() -> None:
+    # Two parallel tasks only M1 can do (ml >= 4 is a must; M2 has ml 1). The square cost
+    # matrix forces one task onto M2 at "ineligible" cost; that pair is dropped and the task
+    # is placed in the next round, again on M1.
+    ml_a = TaskInput(id=3, o=10, m=10, p=10, required_skills=(RequiredSkill("ml", 4),))
+    ml_b = TaskInput(id=4, o=10, m=10, p=10, required_skills=(RequiredSkill("ml", 4),))
+
+    plan = recommend_optimal([ml_a, ml_b], TEAM, {3: WEEK, 4: WEEK})
+
+    recs = {r.task_id: r for r in plan.recommendations}
+    assert {i: r.member_id for i, r in recs.items()} == {3: 1, 4: 1}
+    assert all([m for m, _ in r.ineligible] == [2] for r in recs.values())
+    assert plan.unassigned == 0

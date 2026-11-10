@@ -1,0 +1,12 @@
+# Build context for apps/api/Dockerfile: only what the image needs.
+.venv
+.coverage
+.coverage.*
+htmlcov
+.pytest_cache
+.ruff_cache
+**/__pycache__
+**/*.pyc
+tests
+.env
+.env.*
