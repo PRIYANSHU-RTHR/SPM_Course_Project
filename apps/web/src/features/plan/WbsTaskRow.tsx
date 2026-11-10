@@ -5,7 +5,8 @@ import { cn } from '@/lib/utils'
 import { estimateError, type TaskEdit } from './planModel'
 import { SkillsEditor } from './SkillsEditor'
 
-const HOURS = 'h-7 w-14 rounded-md border border-input bg-surface-2 px-1.5 text-right font-mono text-xs tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring'
+const HOURS =
+  'h-7 w-14 rounded-md border border-input bg-surface-2 px-1.5 text-right font-mono text-xs tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
 interface WbsTaskRowProps {
   task: PlannedTask

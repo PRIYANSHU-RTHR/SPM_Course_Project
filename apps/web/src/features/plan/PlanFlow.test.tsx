@@ -1,71 +1,14 @@
 // @vitest-environment jsdom
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import type { WorkflowEvent, WorkflowState } from '@/lib/api/schemas'
+import { FakeEventSource, mockApi } from '@/test/api'
 import { NewPlanPage } from './NewPlanPage'
 import { EXAMPLE, REVIEW, runState, SKILLS } from './plan.fixtures'
 import { PlanRunPage } from './PlanRunPage'
-
-interface Sent {
-  method: string
-  path: string
-  body: unknown
-  headers: Record<string, string>
-}
-
-/** `fetch` answering from a route table; every request is recorded in `sent`. */
-function mockApi(routes: Record<string, unknown | (() => unknown)>) {
-  const sent: Sent[] = []
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-      const url = new URL(String(input))
-      const method = init?.method ?? 'GET'
-      const path = url.pathname + url.search
-      sent.push({
-        method,
-        path,
-        body: init?.body ? JSON.parse(String(init.body)) : undefined,
-        headers: (init?.headers ?? {}) as Record<string, string>,
-      })
-      const route = routes[`${method} ${path}`]
-      if (route === undefined) {
-        const error = { error: { code: 'not_found', message: 'Not found', details: {} } }
-        return new Response(JSON.stringify(error), { status: 404 })
-      }
-      const body = typeof route === 'function' ? (route as () => unknown)() : route
-      return new Response(JSON.stringify(body), { status: 200 })
-    }),
-  )
-  return sent
-}
-
-class FakeEventSource {
-  static readonly CLOSED = 2
-  static last: FakeEventSource | undefined
-  readyState = 1
-  onopen: (() => void) | null = null
-  onerror: (() => void) | null = null
-  private listeners = new Map<string, ((message: MessageEvent<string>) => void)[]>()
-  readonly url: string
-  constructor(url: string) {
-    this.url = url
-    FakeEventSource.last = this
-  }
-  addEventListener(type: string, listener: (message: MessageEvent<string>) => void) {
-    this.listeners.set(type, [...(this.listeners.get(type) ?? []), listener])
-  }
-  close() {
-    this.readyState = FakeEventSource.CLOSED
-  }
-  emit(event: WorkflowEvent) {
-    const message = new MessageEvent(event.type, { data: JSON.stringify(event) })
-    act(() => this.listeners.get(event.type)?.forEach((listener) => listener(message)))
-  }
-}
 
 let seq = 0
 const node = (name: string, phase: 'start' | 'end', summary = ''): WorkflowEvent => ({
