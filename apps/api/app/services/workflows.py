@@ -13,7 +13,8 @@ import uuid
 from collections.abc import AsyncIterator, Callable
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
+from decimal import Decimal
 from typing import Any
 
 from langgraph.checkpoint.base import BaseCheckpointSaver
@@ -25,7 +26,7 @@ from sqlalchemy import make_url, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.agents.llm import LLMClient
-from app.agents.planning import WBSPlan
+from app.agents.planning import DEMO_BRIEF, WBSPlan
 from app.config import Settings
 from app.engines.calendar import next_working_day
 from app.engines.montecarlo import DEFAULT_RUNS
@@ -55,6 +56,23 @@ from app.workflows.reallocate import ReallocDeps, build_reallocate_graph
 logger = logging.getLogger(__name__)
 
 REALLOCATE_PREFIX = "realloc-"
+
+EXAMPLE_PROJECT_NAME = "Campus Food-Ordering App v2"
+EXAMPLE_WEEKS = 16
+EXAMPLE_BUDGET = Decimal("900000.00")
+
+
+def example_plan(today: date) -> PlanStart:
+    """The demo brief with sensible defaults: start next Monday, deadline 16 weeks later.
+    Its planning reply is recorded, so it runs with LLM_MODE=fixture (no API key)."""
+    start = today + timedelta(days=7 - today.weekday())
+    return PlanStart(
+        brief=DEMO_BRIEF.read_text(encoding="utf-8"),
+        project_name=EXAMPLE_PROJECT_NAME,
+        start_date=start,
+        deadline=start + timedelta(weeks=EXAMPLE_WEEKS) - timedelta(days=3),  # a Friday
+        budget=EXAMPLE_BUDGET,
+    )
 
 
 def _config(thread_id: str) -> dict[str, Any]:

@@ -45,12 +45,17 @@ async function readError(response: Response): Promise<ApiError> {
   }
 }
 
+/** Who performs PM actions; the API records it as `audit_log.actor` (header `X-Actor`). */
+export const ACTOR = 'PM'
+
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const method = (init?.method ?? 'GET').toUpperCase()
+  const actor: Record<string, string> = method === 'GET' ? {} : { 'X-Actor': ACTOR }
   let response: Response
   try {
     response = await fetch(`${API_URL}${path}`, {
       ...init,
-      headers: { 'Content-Type': 'application/json', ...init?.headers },
+      headers: { 'Content-Type': 'application/json', ...actor, ...init?.headers },
     })
   } catch (cause) {
     if (cause instanceof DOMException && cause.name === 'AbortError') throw cause

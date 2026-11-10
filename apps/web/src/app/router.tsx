@@ -1,6 +1,8 @@
 import { createBrowserRouter, Navigate } from 'react-router'
 import { AppShell } from '@/components/shell/AppShell'
 import { ControlPage } from '@/features/control/ControlPage'
+import { NewPlanPage } from '@/features/plan/NewPlanPage'
+import { PlanRunPage } from '@/features/plan/PlanRunPage'
 import { OverviewPage } from '@/features/projects/OverviewPage'
 import { ProjectsPage } from '@/features/projects/ProjectsPage'
 import { RisksPage } from '@/features/risks/RisksPage'
@@ -23,17 +25,8 @@ export const router = createBrowserRouter([
       { path: 'projects/:projectId/team', element: <TeamPage /> },
       { path: 'projects/:projectId/risks', element: <RisksPage /> },
       { path: 'projects/:projectId/control', element: <ControlPage /> },
-      {
-        path: 'plan/new',
-        element: (
-          <PlaceholderPage
-            label="Plan"
-            title="New project plan"
-            step={20}
-            body="Brief to plan, with the live workflow timeline and WBS review."
-          />
-        ),
-      },
+      { path: 'plan/new', element: <NewPlanPage /> },
+      { path: 'plan/:threadId', element: <PlanRunPage /> },
       {
         path: 'approvals',
         element: (

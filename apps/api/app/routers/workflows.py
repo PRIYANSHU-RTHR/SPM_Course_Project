@@ -5,6 +5,7 @@ belong to the reallocation runner."""
 import json
 import threading
 from collections.abc import AsyncIterator
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, Header, Request
@@ -24,7 +25,7 @@ from app.schemas.workflow import (
     WorkflowEvent,
     WorkflowState,
 )
-from app.services.workflows import Workflows, postgres_workflows
+from app.services.workflows import Workflows, example_plan, postgres_workflows
 
 router = APIRouter(prefix="/workflows", tags=["workflows"])
 _init_lock = threading.Lock()
@@ -50,6 +51,13 @@ WorkflowsDep = Annotated[Workflows, Depends(get_workflows)]
 def start_plan(body: PlanStart, workflows: WorkflowsDep) -> PlanStarted:
     """Start brief -> WBS -> estimates -> schedule -> owners; it pauses for PM review."""
     return PlanStarted(thread_id=workflows.plan.start(body))
+
+
+@router.get("/plan/example", name="plan_example", response_model=PlanStart)
+def plan_example() -> PlanStart:
+    """The demo brief with default dates and budget, to prefill the new-project form. With
+    LLM_MODE=fixture this is the brief that has a recorded plan."""
+    return example_plan(datetime.now(UTC).date())
 
 
 @router.get(

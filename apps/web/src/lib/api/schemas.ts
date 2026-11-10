@@ -1,4 +1,4 @@
-import type { components } from './types'
+import type { components, paths } from './types'
 
 type Schemas = components['schemas']
 
@@ -34,3 +34,24 @@ export interface Explanation {
   grounded: boolean
   source: 'model' | 'template'
 }
+
+// Planning workflow (Step 20)
+/** Request body for `POST /workflows/plan`. */
+export type PlanStart = Schemas['PlanStart-Input']
+/** `GET /workflows/plan/example`: the demo brief with defaults. */
+export type PlanExample = Schemas['PlanStart-Output']
+export type PlanStarted = Schemas['PlanStarted']
+export type PlanReview = Schemas['PlanReview']
+export type PlannedTask = Schemas['PlannedTask']
+export type SkillReq = Schemas['SkillReq']
+export type TaskChange = Schemas['TaskChange']
+export type ApproveDecision = Schemas['ApproveDecision']
+export type EditDecision = Schemas['EditDecision']
+export type RejectDecision = Schemas['RejectDecision']
+export type ResumeAccepted = Schemas['ResumeAccepted']
+export type WorkflowState = Schemas['WorkflowState']
+/** One SSE message from `/workflows/{thread_id}/events` (inlined in the OpenAPI response). */
+export type WorkflowEvent =
+  paths['/workflows/{thread_id}/events']['get']['responses'][200]['content']['text/event-stream']
+export type WorkflowStatus = WorkflowState['status']
+export type SkillPage = Schemas['SkillPage']
