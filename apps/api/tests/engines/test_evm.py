@@ -75,3 +75,13 @@ def test_earned_value_and_hours_cost() -> None:
     assert earned_value([D("1000"), D("3000")], [50, 10]) == D("800.00")
     assert hours_cost(0.1, D("800")) == D("80.00")
     assert hours_cost(7.5, D("1250.50")) == D("9378.75")
+
+
+def test_planned_value_of_a_zero_length_task_counts_in_full_from_its_start() -> None:
+    # A milestone placed on a weekend has no working days: all of its value is planned at
+    # its start, none before.
+    sat, sun = date(2026, 11, 14), date(2026, 11, 15)
+    milestone = [BaselineTask(1, sat, sun, D("500"))]
+    assert planned_value(milestone, FRI) == D("0.00")
+    assert planned_value(milestone, sat) == D("500.00")
+    assert planned_value(milestone, date(2026, 11, 20)) == D("500.00")

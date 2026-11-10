@@ -110,6 +110,11 @@ def test_band_tables_are_inclusive_lower_and_exclusive_upper() -> None:
     assert score_below(0.7999, ((0.80, 5), (0.85, 4), (0.90, 3))) == 5
 
 
+def test_value_below_every_band_gets_the_last_score() -> None:
+    assert score_at_least(0.5, ((3, 5), (2, 4), (1, 3))) == 3
+    assert score_at_least(-1, ((3, 5), (2, 4), (1, 3))) == 3
+
+
 # --- member_overload ---------------------------------------------------------------------
 
 
@@ -325,3 +330,28 @@ def test_custom_config_changes_threshold() -> None:
 
     assert keys(None) == []
     assert keys(RiskConfig(p_on_time_threshold=0.7)) == ["low_on_time_probability"]
+
+
+# --- no schedule yet ----------------------------------------------------------------------
+
+
+def test_without_a_schedule_rules_that_need_one_stay_quiet() -> None:
+    snap = snapshot(schedule=None)
+    assert member_overload(snap, CFG) == []
+    assert late_predecessor(replace(snap, as_of=date(2026, 11, 20)), CFG) == []  # B is late
+
+
+def test_without_a_schedule_eligibility_uses_the_cpm_window() -> None:
+    # CPM puts A (16 h) on Mon-Tue. Only Aditi can do it -> bus factor, as with a schedule.
+    [finding] = bus_factor(snapshot(schedule=None), CFG)
+    assert finding.subject_ref == "task:1"
+
+    # A schedule that doesn't contain the task (e.g. added after planning) falls back too.
+    partial = replace(SCHEDULE, tasks=SCHEDULE.tasks[1:])
+    assert [f.subject_ref for f in bus_factor(snapshot(schedule=partial), CFG)] == ["task:1"]
+
+    # Aditi on leave for exactly that CPM window: nobody is eligible -> a skill gap instead.
+    away = replace(ADITI, leave=(LeaveRange(MON, date(2026, 11, 3)),))
+    snap = snapshot(schedule=None, members=(away, RAVI))
+    assert bus_factor(snap, CFG) == []
+    assert [f.subject_ref for f in skill_gap(snap, CFG)] == ["task:1"]

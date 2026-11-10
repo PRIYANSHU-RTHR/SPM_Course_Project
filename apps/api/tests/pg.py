@@ -4,6 +4,7 @@ Tests never touch the database named in DATABASE_URL; they create `orchestrai_te
 databases on the same server and drop them afterwards.
 """
 
+import os
 import uuid
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -23,17 +24,24 @@ def server_url() -> URL:
 
 
 def skip_reason() -> str | None:
-    """None if Postgres accepts our credentials, else a human-readable reason to skip."""
+    """None if Postgres accepts our credentials, else a human-readable reason to skip.
+
+    With `REQUIRE_POSTGRES=1` (set in CI) an unreachable server is an error instead, so a
+    broken service container can't turn the database tests into silent skips.
+    """
     url = server_url()
     engine = create_engine(url, connect_args={"connect_timeout": 3})
     try:
         with engine.connect():
             return None
-    except OperationalError:
-        return (
+    except OperationalError as exc:
+        reason = (
             f"Postgres not reachable at {url.host}:{url.port}/{url.database} "
             "(start it with `make db-up` and point DATABASE_URL at it)"
         )
+        if os.environ.get("REQUIRE_POSTGRES") == "1":
+            raise RuntimeError(f"{reason}; REQUIRE_POSTGRES=1, so this is an error") from exc
+        return reason
     finally:
         engine.dispose()
 
