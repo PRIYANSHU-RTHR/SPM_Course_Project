@@ -60,8 +60,14 @@ def _start(client: TestClient, runner: PlanWorkflows) -> str:
     return thread_id
 
 
-def _resume(client: TestClient, runner: PlanWorkflows, thread_id: str, body: dict) -> None:
-    response = client.post(f"/workflows/{thread_id}/resume", json=body)
+def _resume(
+    client: TestClient,
+    runner: PlanWorkflows,
+    thread_id: str,
+    body: dict,
+    headers: dict[str, str] | None = None,
+) -> None:
+    response = client.post(f"/workflows/{thread_id}/resume", json=body, headers=headers)
     assert response.status_code == 202, response.text
     runner.wait(thread_id, WAIT)
 
@@ -118,7 +124,7 @@ def test_runs_to_review_then_approve_commits_the_project(
     assert recs["total_score"] == pytest.approx(sum(r["score"]["total"] for r in chosen))
 
     projects_before = _count(db, Project)
-    _resume(client, workflows, thread_id, {"action": "approve", "actor": "pm:asha"})
+    _resume(client, workflows, thread_id, {"action": "approve"}, {"X-Actor": "pm:asha"})
     state = _state(client, thread_id)
 
     assert state["status"] == "committed"

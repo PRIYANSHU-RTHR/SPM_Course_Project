@@ -1,8 +1,15 @@
 """Shared API schemas: error body, pagination envelope, PATCH base."""
 
-from typing import Any, ClassVar, Self
+from typing import Annotated, Any, ClassVar, Self
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic.json_schema import SkipJsonSchema
+
+# Who performed a PM action. Request bodies carry it internally (workflow state, services),
+# but clients never send it: routers set it from the `X-Actor` header (routers/deps.py), so
+# it is left out of the OpenAPI schema.
+Actor = Annotated[SkipJsonSchema[str], Field(min_length=1, max_length=120)]
+DEFAULT_ACTOR = "PM"
 
 
 class ErrorBody(BaseModel):

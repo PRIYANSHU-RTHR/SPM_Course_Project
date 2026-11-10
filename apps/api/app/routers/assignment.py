@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.agents.explanation import Explanation
 from app.agents.llm import LLMClient
 from app.db import get_session
+from app.routers.deps import ActorDep
 from app.schemas.assignment import AppliedAssignment, ApplyRequest, Mode, RecommendResponse
 from app.services import agents, assignment
 
@@ -26,8 +27,11 @@ def recommend(
 @router.post(
     "/{project_id}/assignments/apply", name="apply", response_model=list[AppliedAssignment]
 )
-def apply(project_id: int, body: ApplyRequest, session: SessionDep) -> list[AppliedAssignment]:
-    return assignment.apply(session, project_id, body)
+def apply(
+    project_id: int, body: ApplyRequest, session: SessionDep, actor: ActorDep
+) -> list[AppliedAssignment]:
+    """PM override or bulk apply; one audit row per assignment, actor from `X-Actor`."""
+    return assignment.apply(session, project_id, body.model_copy(update={"actor": actor}))
 
 
 @router.get(

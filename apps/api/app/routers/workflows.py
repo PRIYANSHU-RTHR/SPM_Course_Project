@@ -13,6 +13,7 @@ from pydantic import Field
 from sse_starlette import EventSourceResponse, ServerSentEvent
 
 from app.db import get_session_factory
+from app.routers.deps import ActorDep
 from app.schemas.common import CONFLICT, NOT_FOUND
 from app.schemas.reallocation import ReallocationState
 from app.schemas.workflow import (
@@ -98,9 +99,13 @@ def get_state(thread_id: str, workflows: WorkflowsDep) -> WorkflowState | Reallo
     responses={**NOT_FOUND, **CONFLICT},
 )
 def resume(
-    thread_id: str, decision: Annotated[PlanDecision, Body()], workflows: WorkflowsDep
+    thread_id: str,
+    decision: Annotated[PlanDecision, Body()],
+    workflows: WorkflowsDep,
+    actor: ActorDep,
 ) -> ResumeAccepted:
     """Plan: approve -> commit; edit -> re-estimate and review again; reject -> end.
     Reallocation: approve -> apply new owners; reject (reason required) -> owners unchanged."""
+    decision = decision.model_copy(update={"actor": actor})
     workflows.runner(thread_id).resume(thread_id, decision)
     return ResumeAccepted(thread_id=thread_id, status="running")

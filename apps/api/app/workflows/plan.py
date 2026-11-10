@@ -52,6 +52,7 @@ from app.engines.scheduler import ScheduleError, schedule
 from app.engines.types import MemberInput, RequiredSkill, TaskInput
 from app.models import AssignmentSource, AuditLog, Dependency, Epic, Member, Project, Skill, Task
 from app.schemas.assignment import ApplyItem, ApplyRequest, ScoreOut
+from app.schemas.common import DEFAULT_ACTOR
 from app.schemas.estimate import Cocomo
 from app.schemas.workflow import (
     ApproveDecision,
@@ -392,7 +393,7 @@ def build_plan_graph(deps: PlanDeps) -> StateGraph:
     def commit(state: PlanState) -> NodeResult:
         thread_id, req = state["thread_id"], state["request"]
         wbs = WBSPlan.model_validate(state["wbs"])
-        actor = state["decisions"][-1].get("actor", "pm")
+        actor = state["decisions"][-1].get("actor", DEFAULT_ACTOR)
         with deps.session_factory() as s:
             # Re-running after a crash between DB commit and checkpoint must not duplicate.
             done = s.scalar(

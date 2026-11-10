@@ -94,12 +94,11 @@ def test_apply_writes_assignment_and_audit_log(api: Client) -> None:
 
     first = http.post(
         f"/projects/{pid}/assignments/apply",
-        json={"actor": "pm", "items": [{"task_id": tasks[0], "member_id": members[0]}]},
+        json={"items": [{"task_id": tasks[0], "member_id": members[0]}]},
     )
     second = http.post(
         f"/projects/{pid}/assignments/apply",
         json={
-            "actor": "pm",
             "items": [
                 {
                     "task_id": tasks[0],
@@ -118,6 +117,7 @@ def test_apply_writes_assignment_and_audit_log(api: Client) -> None:
         assert [(a.task_id, a.member_id) for a in current] == [(tasks[0], members[1])]
         audit = s.scalars(select(AuditLog).order_by(AuditLog.id)).all()
         assert [a.action for a in audit] == ["assignment.ai", "assignment.pm_override"]
+        assert [a.actor for a in audit] == ["PM", "PM"]  # no X-Actor header -> default
         assert audit[1].before == {"task_id": tasks[0], "member_id": members[0]}
         assert audit[1].reason == "Aarav is on the payments spike"
 
@@ -130,7 +130,6 @@ def test_override_without_reason_is_422(api: Client) -> None:
     response = http.post(
         f"/projects/{pid}/assignments/apply",
         json={
-            "actor": "pm",
             "items": [{"task_id": tasks[0], "member_id": members[0], "source": "pm_override"}],
         },
     )
@@ -144,7 +143,7 @@ def test_apply_unknown_member_is_404(api: Client) -> None:
 
     response = http.post(
         f"/projects/{pid}/assignments/apply",
-        json={"actor": "pm", "items": [{"task_id": tasks[0], "member_id": 999}]},
+        json={"items": [{"task_id": tasks[0], "member_id": 999}]},
     )
     assert response.status_code == 404
     assert response.json()["error"]["details"] == {"member_ids": [999]}

@@ -6,7 +6,7 @@ from typing import Any, Literal, Self
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.models.enums import AssignmentSource
-from app.schemas.common import ReadModel
+from app.schemas.common import DEFAULT_ACTOR, Actor, ReadModel
 
 
 class AssignmentRead(ReadModel):
@@ -112,7 +112,7 @@ class ApplyItem(BaseModel):
 
 
 class ApplyRequest(BaseModel):
-    actor: str = Field(min_length=1, max_length=120)
+    actor: Actor = DEFAULT_ACTOR
     items: list[ApplyItem] = Field(min_length=1)
 
 

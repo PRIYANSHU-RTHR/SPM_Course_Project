@@ -126,3 +126,57 @@ erDiagram
 ```
 
 `audit_log` points at the changed row through `entity` + `entity_id` (no foreign key). This lets it record any table, and audit rows survive deletes.
+
+## Disruption → approval flow
+
+A disruption is a fact: it is written (and audited) as soon as it is posted. The PM approves or rejects only the reassignment that follows. The reallocation graph (`app/workflows/reallocate.py`) runs in a worker thread and pauses once, at `pm_approval`, with `interrupt()`. Its state is checkpointed in Postgres under `thread_id`. Every number in the proposal and in `/metrics` comes from the engines through `services/scenario.py`. Every PM request can send an `X-Actor` header (default `PM`), which becomes `audit_log.actor`.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor PM
+    participant UI as Web UI
+    participant API as FastAPI
+    participant WF as Reallocation graph
+    participant ENG as Engines (scenario)
+    participant DB as Postgres
+
+    UI->>API: GET /projects/{id}/metrics
+    API->>ENG: evaluate(now)
+    API-->>UI: P(on time), P50/P80, SPI, CPI, risks, overloaded ("before" chips)
+
+    PM->>UI: Disruption simulator: leave / slip / scope add
+    UI->>API: POST /projects/{id}/disruptions (X-Actor)
+    API->>API: check_disruption (404 / 422), one run per project (409)
+    API-->>UI: 202 {thread_id}
+    UI->>API: GET /workflows/{thread_id}/events (SSE)
+
+    API->>WF: start(thread_id)
+    WF->>DB: apply_event: write the fact + audit (disruption.*)
+    WF->>ENG: recompute: risk register, affected tasks
+    WF->>ENG: propose: optimal assignment for affected tasks, before / now / if-approved
+    WF->>DB: reallocation row (pending, payload = diff)
+    WF-->>WF: interrupt() at pm_approval (checkpointed)
+    API-->>UI: SSE node events (start / end per node), then run: waiting
+
+    UI->>API: GET /projects/{id}/proposals/{thread_id}
+    API->>DB: reallocation row
+    API-->>UI: full diff: per-task owner/score/finish, metric chips, risks close/open
+
+    PM->>UI: Approve (or reject with reason)
+    UI->>API: POST /workflows/{thread_id}/resume {action} (X-Actor)
+    API->>WF: Command(resume=decision + actor)
+    alt approve
+        WF->>DB: row approved + audit (reallocation.approved)
+        WF->>DB: new owners + one audit row per task (assignment.ai)
+        WF->>ENG: recompute_final: refresh risks, outcome
+    else reject
+        WF->>DB: row rejected + audit (reallocation.rejected), owners unchanged
+    end
+    API-->>UI: SSE run: committed / rejected (stream ends)
+
+    UI->>API: GET /projects/{id}/metrics
+    API-->>UI: "after" chips (UI animates before → after)
+    UI->>API: GET /projects/{id}/audit?limit&offset
+    API-->>UI: newest first, each row with a readable summary
+```

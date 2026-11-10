@@ -6,7 +6,7 @@ from fastapi import APIRouter, Body, Query
 from sqlalchemy import select
 
 from app.models import Reallocation, ReallocationStatus
-from app.routers.deps import PageDep, SessionDep
+from app.routers.deps import ActorDep, PageDep, SessionDep
 from app.routers.workflows import WorkflowsDep
 from app.schemas.common import CONFLICT, NOT_FOUND
 from app.schemas.reallocation import (
@@ -17,6 +17,7 @@ from app.schemas.reallocation import (
 )
 from app.services.common import paginate
 from app.services.inputs import get_project
+from app.services.proposals import get_reallocation
 
 router = APIRouter(prefix="/projects", tags=["reallocation"])
 
@@ -29,10 +30,14 @@ router = APIRouter(prefix="/projects", tags=["reallocation"])
     responses={**NOT_FOUND, **CONFLICT},
 )
 def create_disruption(
-    project_id: int, disruption: Annotated[Disruption, Body()], workflows: WorkflowsDep
+    project_id: int,
+    disruption: Annotated[Disruption, Body()],
+    workflows: WorkflowsDep,
+    actor: ActorDep,
 ) -> DisruptionStarted:
     """Record the disruption (leave, slip, new scope) and start the reallocation run. Its
     proposal appears under `/proposals?status=pending`; decide with `/workflows/{id}/resume`."""
+    disruption = disruption.model_copy(update={"actor": actor})
     thread_id = workflows.reallocate.start(project_id, disruption)
     return DisruptionStarted(thread_id=thread_id, project_id=project_id)
 
@@ -61,3 +66,16 @@ def list_proposals(
         limit=page.limit,
         offset=page.offset,
     )
+
+
+@router.get(
+    "/{project_id}/proposals/{thread_id}",
+    name="get_proposal",
+    response_model=ReallocationRead,
+    responses=NOT_FOUND,
+)
+def get_proposal(session: SessionDep, project_id: int, thread_id: str) -> ReallocationRead:
+    """One proposal with its full diff: per-task owner/score/finish before and after,
+    before-disruption / now / if-approved metrics, and risks that would close or open.
+    404 until the run has reached its proposal (follow `/workflows/{thread_id}/events`)."""
+    return ReallocationRead.model_validate(get_reallocation(session, project_id, thread_id))
