@@ -34,7 +34,7 @@ function MetricColumns({ payload }: { payload: ProposalPayload }) {
               ) : null}
             </dd>
             <dd className="numeric text-xs text-muted-foreground">
-              finish {formatShortDate(m.finish)} · P80 {formatShortDate(m.p80)}
+              P50 {formatShortDate(m.p50)} · P80 {formatShortDate(m.p80)}
             </dd>
           </div>
         )
@@ -83,6 +83,13 @@ export function ProposalCard({ projectId, payload, heading }: ProposalCardProps)
           {payload.summary}
         </p>
         <MetricColumns payload={payload} />
+        {payload.if_approved.finish > payload.now.finish ? (
+          <p className="rounded-lg border border-warning/40 px-3 py-2 text-warning">
+            Approving finishes later ({formatShortDate(payload.if_approved.finish)}) than keeping
+            the current owners ({formatShortDate(payload.now.finish)}). The engine optimises skill
+            fit, capacity and balance, not the finish date; consider rejecting.
+          </p>
+        ) : null}
         <ProposalDiff items={payload.items} />
         <div className="grid gap-3 md:grid-cols-2">
           <RiskList

@@ -27,13 +27,7 @@ export type ApplyRequest = Schemas['ApplyRequest']
 export type AppliedAssignment = Schemas['AppliedAssignment']
 export type ScheduledTask = Schemas['ScheduledTaskOut']
 
-/** Hand-written until Step 16 merges, then replace with the generated `Explanation` type. */
-export interface Explanation {
-  recommended_member_id: number | null
-  text: string
-  grounded: boolean
-  source: 'model' | 'template'
-}
+export type Explanation = Schemas['Explanation']
 
 // Planning workflow (Step 20)
 /** Request body for `POST /workflows/plan`. */

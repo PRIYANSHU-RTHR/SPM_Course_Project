@@ -12,7 +12,8 @@ from app.engines.types import ForecastResult, TaskInput
 from app.errors import ConflictError
 from app.models import Project
 from app.schemas.forecast import CdfPoint, HistogramBin, Percentile, ProjectForecast
-from app.services.inputs import get_project, load_tasks
+from app.services.inputs import get_project, load_tasks, project_today
+from app.services.scenario import load_scenario
 
 
 def _on_day(start: date, hours: float) -> Percentile:
@@ -46,12 +47,21 @@ def build_forecast(
 
 
 def project_forecast(session: Session, project_id: int, runs: int, seed: int) -> ProjectForecast:
+    """Resource-adjusted forecast at the project's clock (services/scenario.py), so this, the
+    risk register, /metrics and reallocation proposals all report the same P(on time)."""
     project = get_project(session, project_id)
-    result = build_forecast(session, project, runs, seed)
+    as_of = project_today(project)
+    scenario = load_scenario(session, project, as_of, seed, runs)
+    outcome = scenario.evaluate()
+    adjusted = outcome.forecast
+    # An empty plan has nothing to schedule: the plain engine result (everything on time).
+    result = adjusted if adjusted is not None else build_forecast(session, project, runs, seed)
+    shift = outcome.shift_hours if adjusted is not None else 0.0
 
     start = project.start_date
     return ProjectForecast(
         project_id=project_id,
+        as_of=as_of,
         runs=result.runs,
         seed=result.seed,
         deadline=project.deadline,
@@ -64,4 +74,5 @@ def project_forecast(session: Session, project_id: int, runs: int, seed: int) ->
         histogram=[HistogramBin(start_hours=h, runs=c) for h, c in result.histogram],
         cdf=[CdfPoint(hours=h, probability=p) for h, p in result.cdf],
         criticality=result.criticality,
+        resource_shift_hours=shift,
     )

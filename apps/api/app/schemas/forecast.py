@@ -21,7 +21,10 @@ class Percentile(BaseModel):
 
 
 class ProjectForecast(BaseModel):
+    """Resource-adjusted: the same evaluation as /metrics, the risk register and proposals."""
+
     project_id: int
+    as_of: date = Field(description="The project's clock (`sim_date`, else today)")
     runs: int
     seed: int
     deadline: date
@@ -34,3 +37,7 @@ class ProjectForecast(BaseModel):
     histogram: list[HistogramBin]
     cdf: list[CdfPoint]
     criticality: dict[int, float] = Field(description="Task id -> share of runs on a longest path")
+    resource_shift_hours: float = Field(
+        description="Remaining work planned with owners, leave and progress minus the network "
+        "alone (h); added to every run"
+    )
