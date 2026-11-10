@@ -15,7 +15,7 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 | 19 | Projects list and overview | Done, in [PR #5](https://github.com/PRIYANSHU-RTHR/SPM_Course_Project/pull/5), not merged | PR review by a teammate |
 | 21 | Network graph and Gantt | Done, on `feat/21-network-gantt`, no PR yet | PR after PR #5 merges |
 | 23 | Risk, EVM and forecast views | Done, on `feat/23-risk-evm-forecast`, no PR yet | PR after Step 21 merges. Generate plan needs Step 16 |
-| 22 | Team and assignment views | Next | AI explanations need Step 16 merged |
+| 22 | Team and assignment views | Done, on `feat/22-team-assignments`, no PR yet | PR after Step 23 merges. AI explanations need Step 16 |
 | 20 | New project flow | Not started | Mock stream until Step 15 exists |
 | 24 (UI) | Disruption simulator, approvals, audit | Blocked | 17 and Priyanshu's Step 24 API work merged |
 | 27 | Docs, polish, deploy | Blocked | 26 merged |
@@ -33,7 +33,8 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 2. Raise the open questions below. The forecast one blocks the demo story.
 3. Open the Step 21 PR once Step 19 is on `main`.
 4. Open the Step 23 PR once Step 21 is on `main`.
-5. Start Step 22 next. Its real data is ready, apart from the AI explanations in Step 16.
+5. Open the Step 22 PR once Step 23 is on `main`.
+6. Step 20 is next. It needs a mock stream until Step 15 exists.
 
 ## Work done
 
@@ -144,6 +145,26 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 - Generate plan is built to the Step 16 format. On the real API it shows a clear message until Step 16 merges.
 - Owner role comes from the RMMM plan, so it is empty until a plan exists.
 
+### Step 22 · Team and assignment views (2026-11-06)
+
+**Built**
+
+- `/projects/:id/team`: skills matrix with bus-factor warnings and a capacity heatmap by ISO week, with clickable cells.
+- Assignments table with a Greedy and Optimal toggle and a compare strip.
+- Recommendation sheet: top candidates with stacked score bars, ineligible members with reasons, Approve and Override.
+
+**Checked**
+
+- Typecheck, lint, 73 web tests and build pass.
+- Tested at 1440px and 390px, including an empty project and a missing project.
+- Approve and Override ran against the real API and wrote to the audit log. Demo data was reseeded afterwards.
+
+**Decisions**
+
+- The page reads both `score` and `total`, and new rows store both, so either team decision works.
+- Approve and Override are hidden on done tasks.
+- Override can pick any member. Ineligible members are marked, because a PM may knowingly accept that.
+
 ## Future requirements
 
 ### For my next steps
@@ -155,6 +176,8 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 
 ### Questions for the team
 
+- [ ] **Manveer:** greedy beats optimal on the seed: 2,248 vs 2,237. The plan says optimal should win. Is the seed or the engine the reason?
+- [ ] **Team:** 12 of 14 skills show a bus-factor warning. Keep the rule, or limit it to critical tasks?
 - [ ] **Manveer:** merge Step 16, then Generate plan can be tested on the real API. The `rmmm` format is settled by that branch.
 - [ ] **Team:** should projects have an owner? The Step 19 brief lists an owner column, but the project table has no such field.
 - [ ] **Priyanshu:** `ruff check` fails at `app/agents/llm.py:12` (line too long), which will fail CI in Step 25.

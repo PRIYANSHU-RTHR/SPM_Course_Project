@@ -24,6 +24,15 @@ export function isMonday(date: string): boolean {
   return new Date(toTime(date)).getUTCDay() === 1
 }
 
+/** ISO 8601 week number: weeks start on Monday, and week 1 holds the first Thursday. */
+export function isoWeek(date: string): number {
+  const day = new Date(toTime(date))
+  const weekday = day.getUTCDay() || 7
+  const thursday = toTime(addDays(date, 4 - weekday))
+  const yearStart = Date.UTC(new Date(thursday).getUTCFullYear(), 0, 1)
+  return Math.ceil(((thursday - yearStart) / DAY_MS + 1) / 7)
+}
+
 /** Today's date on the viewer's clock. */
 export function todayIso(now = new Date()): string {
   const month = String(now.getMonth() + 1).padStart(2, '0')
