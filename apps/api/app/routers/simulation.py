@@ -4,9 +4,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query, Request
 
-from app.routers.deps import PageDep, SessionDep
+from app.routers.deps import ActorDep, PageDep, SessionDep
 from app.schemas.common import NOT_FOUND
-from app.schemas.reallocation import AdvanceResult, AuditPage, AuditRead
+from app.schemas.reallocation import AdvanceResult, AuditPage
 from app.services.audit import list_audit
 from app.services.simulation import advance
 
@@ -25,7 +25,7 @@ def advance_clock(
     session: SessionDep,
     project_id: int,
     days: Annotated[int, Query(ge=1, le=90, description="Calendar days to move forward")],
-    actor: Annotated[str, Query(min_length=1, max_length=120)] = "pm",
+    actor: ActorDep,
 ) -> AdvanceResult:
     """Move the project's simulated "today" forward; generate progress and one snapshot per
     working day (seeded by SIM_SEED), then recompute EVM and the risk register."""
@@ -35,10 +35,10 @@ def advance_clock(
 @audit_router.get("/{project_id}/audit", name="list", response_model=AuditPage, responses=NOT_FOUND)
 def list_project_audit(session: SessionDep, project_id: int, page: PageDep) -> AuditPage:
     """Every audited change to the project, its tasks, assignments, risks and proposals,
-    newest first."""
+    newest first, each with a one-line human-readable `summary`."""
     items, total = list_audit(session, project_id, page)
     return AuditPage(
-        items=[AuditRead.model_validate(a) for a in items],
+        items=items,
         total=total,
         limit=page.limit,
         offset=page.offset,

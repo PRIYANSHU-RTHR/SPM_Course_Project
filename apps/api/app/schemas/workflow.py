@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field, model_validator
 
 from app.agents.planning import SkillReq, WBSPlan
 from app.schemas.assignment import ScoreOut
+from app.schemas.common import DEFAULT_ACTOR, Actor
 from app.schemas.estimate import Cocomo
 
 DEFAULT_HOURLY_RATE = Decimal("850.00")
@@ -133,7 +134,7 @@ class TaskChange(BaseModel):
 
 
 class _Decision(BaseModel):
-    actor: str = Field(default="pm", min_length=1, max_length=120)
+    actor: Actor = DEFAULT_ACTOR
 
 
 class ApproveDecision(_Decision):

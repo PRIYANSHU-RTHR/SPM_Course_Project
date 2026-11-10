@@ -23,6 +23,7 @@ from app.engines.estimation import pert
 from app.engines.scheduler import ScheduleError, schedule
 from app.errors import ValidationFailedError
 from app.models import Assignment, AuditLog, Snapshot, Task, TaskStatus
+from app.schemas.common import DEFAULT_ACTOR
 from app.schemas.reallocation import AdvanceResult
 from app.services.evm import build_evm
 from app.services.inputs import get_project, load_members, load_tasks, project_today, run_cpm
@@ -36,7 +37,7 @@ COST_FACTOR = (0.80, 1.02)
 
 
 def advance(
-    session: Session, project_id: int, days: int, seed: int, actor: str = "pm"
+    session: Session, project_id: int, days: int, seed: int, actor: str = DEFAULT_ACTOR
 ) -> AdvanceResult:
     project = get_project(session, project_id)
     old = project_today(project)

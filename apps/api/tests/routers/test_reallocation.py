@@ -27,6 +27,8 @@ from app.models import (
     Dependency,
     Project,
     Reallocation,
+    Risk,
+    RiskStatus,
     Snapshot,
     Task,
 )
@@ -76,8 +78,14 @@ def _disrupt(client: TestClient, runner: ReallocateWorkflows, body: dict) -> dic
     return state
 
 
-def _decide(client: TestClient, runner: ReallocateWorkflows, thread_id: str, body: dict) -> dict:
-    response = client.post(f"/workflows/{thread_id}/resume", json=body)
+def _decide(
+    client: TestClient,
+    runner: ReallocateWorkflows,
+    thread_id: str,
+    body: dict,
+    headers: dict[str, str] | None = None,
+) -> dict:
+    response = client.post(f"/workflows/{thread_id}/resume", json=body, headers=headers)
     assert response.status_code == 202, response.text
     runner.wait(thread_id, WAIT)
     state: dict = client.get(f"/workflows/{thread_id}/state").json()
@@ -150,7 +158,8 @@ def test_approve_applies_new_owners_with_audit(
         client,
         realloc,
         thread_id,
-        {"action": "approve", "actor": "pm:asha", "reason": "Diya knows the payments code"},
+        {"action": "approve", "reason": "Diya knows the payments code"},
+        {"X-Actor": "pm:asha"},
     )
 
     assert state["status"] == "committed"
@@ -347,3 +356,132 @@ def test_advance_validates_days_and_project(client: TestClient, db: Session) -> 
     assert client.post("/projects/1/simulate/advance", params={"days": 91}).status_code == 422
     assert client.post("/projects/999/simulate/advance", params={"days": 1}).status_code == 404
     assert client.get("/projects/999/audit").status_code == 404
+
+
+# -- Step 24 (API): proposal detail, metrics, X-Actor, readable audit ---------------------------
+
+
+def test_proposal_detail_returns_the_full_diff(
+    client: TestClient, realloc: ReallocateWorkflows
+) -> None:
+    proposal = _disrupt(client, realloc, LEAVE)["proposal"]
+    thread_id = proposal["thread_id"]
+
+    response = client.get(f"/projects/1/proposals/{thread_id}")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert (body["thread_id"], body["status"], body["decided_by"]) == (thread_id, "pending", None)
+    assert body["payload"] == proposal  # same diff the workflow is waiting on
+    assert {"before_disruption", "now", "if_approved", "items"} <= set(body["payload"])
+
+    _decide(client, realloc, thread_id, {"action": "approve"}, {"X-Actor": "pm:asha"})
+    decided = client.get(f"/projects/1/proposals/{thread_id}").json()
+    assert (decided["status"], decided["decided_by"]) == ("approved", "pm:asha")
+
+
+def test_proposal_detail_404s(client: TestClient, realloc: ReallocateWorkflows) -> None:
+    proposal = _disrupt(client, realloc, LEAVE)["proposal"]
+
+    assert client.get("/projects/1/proposals/realloc-nope").status_code == 404
+    assert client.get(f"/projects/999/proposals/{proposal['thread_id']}").status_code == 404
+
+
+def _metrics(client: TestClient) -> dict:
+    response = client.get("/projects/1/metrics")
+    assert response.status_code == 200, response.text
+    body: dict = response.json()
+    return body
+
+
+def test_metrics_are_compact_and_move_with_the_disruption(
+    client: TestClient, realloc: ReallocateWorkflows, db: Session
+) -> None:
+    before = _metrics(client)
+
+    assert set(before) == {
+        "project_id", "as_of", "deadline", "p_on_time", "p50", "p80",
+        "spi", "cpi", "open_risks", "overloaded_members",
+    }  # fmt: skip
+    assert before["as_of"] == TODAY.isoformat()
+    assert 0 <= before["p_on_time"] <= 1
+    assert before["p50"] <= before["p80"]
+    assert before["spi"] is not None and before["cpi"] is not None
+    assert 0 <= before["overloaded_members"] <= before["open_risks"]
+    # Same scenario as the register: after a refresh, the open rows match the count.
+    assert client.post("/projects/1/risks/refresh").status_code == 200
+    db.expire_all()
+    open_rows = db.scalar(
+        select(func.count()).where(Risk.project_id == 1, Risk.status != RiskStatus.CLOSED)
+    )
+    assert open_rows == before["open_risks"]
+
+    proposal = _disrupt(client, realloc, LEAVE)["proposal"]
+    now = _metrics(client)
+    assert now["p80"] >= before["p80"]
+    assert now["p_on_time"] <= before["p_on_time"]
+
+    _decide(client, realloc, proposal["thread_id"], {"action": "approve"})
+    after = _metrics(client)
+    assert after["p80"] <= now["p80"]
+    assert after["p_on_time"] >= now["p_on_time"]
+    assert (after["spi"], after["cpi"]) == (now["spi"], now["cpi"])  # owners change no work done
+
+
+def test_metrics_unknown_project_is_404(client: TestClient) -> None:
+    assert client.get("/projects/999/metrics").status_code == 404
+
+
+def test_x_actor_header_is_the_audit_actor(
+    client: TestClient, realloc: ReallocateWorkflows, db: Session
+) -> None:
+    started = client.post("/projects/1/disruptions", json=LEAVE, headers={"X-Actor": "pm:ravi"})
+    assert started.status_code == 202, started.text
+    thread_id = started.json()["thread_id"]
+    realloc.wait(thread_id, WAIT)
+    _decide(client, realloc, thread_id, {"action": "reject", "reason": "Back early"})
+    _advance(client, 1)
+
+    db.expire_all()
+    actors = dict(db.execute(select(AuditLog.action, AuditLog.actor)).all())
+    assert actors["disruption.leave"] == "pm:ravi"
+    assert actors["reallocation.rejected"] == "PM"  # no header -> default
+    assert actors["simulation.advance"] == "PM"
+    # A body `actor` is not part of the API: the header wins.
+    advance = client.post(
+        "/projects/1/simulate/advance", params={"days": 1}, headers={"X-Actor": "pm:asha"}
+    )
+    assert advance.status_code == 200
+    db.expire_all()
+    last = db.scalars(select(AuditLog).order_by(AuditLog.id.desc())).first()
+    assert last is not None and (last.action, last.actor) == ("simulation.advance", "pm:asha")
+
+
+def test_audit_has_readable_summaries_and_pages(
+    client: TestClient, realloc: ReallocateWorkflows
+) -> None:
+    proposal = _disrupt(client, realloc, LEAVE)["proposal"]
+    _decide(client, realloc, proposal["thread_id"], {"action": "approve"}, {"X-Actor": "pm:asha"})
+    moved = next(i for i in proposal["items"] if i["task_id"] == 12)
+
+    audit = client.get("/projects/1/audit", params={"limit": 200}).json()
+    by_action = {a["action"]: a["summary"] for a in reversed(audit["items"])}  # newest wins
+
+    assert all(a["summary"] for a in audit["items"])
+    assert by_action["disruption.leave"] == (
+        "PM recorded leave for Aarav Mehta from 2026-11-09 to 2026-11-20"
+    )
+    assert by_action["reallocation.approved"] == (
+        f"pm:asha approved reallocation proposal #{proposal['reallocation_id']}"
+    )
+    move = next(
+        a["summary"]
+        for a in audit["items"]
+        if a["action"] == "assignment.ai" and "T-012" in a["summary"]
+    )
+    assert move.startswith("pm:asha reassigned T-012 “")
+    assert move.endswith(f"from Aarav Mehta to {moved['after']['name']} (AI recommendation)")
+
+    page = client.get("/projects/1/audit", params={"limit": 2, "offset": 1}).json()
+    assert (page["limit"], page["offset"], page["total"]) == (2, 1, audit["total"])
+    assert [a["id"] for a in page["items"]] == [a["id"] for a in audit["items"][1:3]]

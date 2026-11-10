@@ -6,7 +6,7 @@ from typing import Annotated, Any, Literal, Self
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.models.enums import ReallocationStatus
-from app.schemas.common import Page, ReadModel
+from app.schemas.common import DEFAULT_ACTOR, Actor, Page, ReadModel
 from app.schemas.risk import RiskRefreshResult
 from app.schemas.task import TaskCreate
 from app.schemas.workflow import WorkflowStatus
@@ -15,7 +15,7 @@ from app.schemas.workflow import WorkflowStatus
 
 
 class _DisruptionBase(BaseModel):
-    actor: str = Field(default="pm", min_length=1, max_length=120)
+    actor: Actor = DEFAULT_ACTOR
     reason: str | None = Field(default=None, max_length=2000)
 
 
@@ -187,6 +187,9 @@ class AuditRead(ReadModel):
     after: dict[str, Any] | None
     reason: str | None
     created_at: datetime
+    summary: str = Field(
+        description="One readable line built from this row and the names it refers to"
+    )
 
 
 class AuditPage(Page[AuditRead]):
