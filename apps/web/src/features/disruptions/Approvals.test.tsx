@@ -105,7 +105,7 @@ describe('ApprovalsPage', () => {
       type: 'leave',
       member_id: 1,
       start_date: '2026-11-07',
-      end_date: '2026-11-18',
+      end_date: '2026-11-13',
       reason: null,
     })
     const stream = FakeEventSource.last!

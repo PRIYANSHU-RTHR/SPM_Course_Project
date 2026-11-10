@@ -34,7 +34,7 @@ function MetricColumns({ payload }: { payload: ProposalPayload }) {
               ) : null}
             </dd>
             <dd className="numeric text-xs text-muted-foreground">
-              finish {formatShortDate(m.finish)} · P80 {formatShortDate(m.p80)}
+              P50 {formatShortDate(m.p50)} · P80 {formatShortDate(m.p80)}
             </dd>
           </div>
         )

@@ -8,7 +8,7 @@ export function LeaveForm(props: FormProps) {
   const { create, submit } = useSubmit(props)
   const [memberId, setMemberId] = useState('')
   const [start, setStart] = useState(addDays(props.today, 1))
-  const [end, setEnd] = useState(addDays(props.today, 12))
+  const [end, setEnd] = useState(addDays(props.today, 7))
   const [reason, setReason] = useState('')
   const valid = memberId !== '' && start !== '' && end >= start
 
