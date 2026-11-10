@@ -2,8 +2,8 @@
 # OrchestrAI API: FastAPI + engines + LangGraph. Multi-stage: uv builds the venv, the runtime
 # stage copies it and runs as a non-root user. On start: alembic upgrade head, then uvicorn.
 
-# The app lives at /srv/orchestrai/api: app/config.py looks for the repo-root .env three
-# levels above app/, which needs at least that many parent directories.
+# The app lives at /srv/orchestrai/api (the record-fixtures bind mount uses this path). There
+# is no repo-root .env in the image; settings come from the environment.
 ARG APP_DIR=/srv/orchestrai/api
 
 FROM ghcr.io/astral-sh/uv:0.12.15 AS uv
