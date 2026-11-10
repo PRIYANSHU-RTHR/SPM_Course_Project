@@ -84,7 +84,10 @@ export function PlanRunPage() {
 
   return (
     <>
-      <PageHeader label={`Plan run · ${threadId.slice(0, 8)}`} title={run?.review?.project_name ?? 'Planning run'}>
+      <PageHeader
+        label={`Plan run · ${threadId.slice(0, 8)}`}
+        title={run?.review?.project_name ?? 'Planning run'}
+      >
         {status === 'waiting'
           ? 'Review the draft. Edit hours or skills and request changes, or approve it.'
           : status === 'running'
@@ -95,7 +98,9 @@ export function PlanRunPage() {
         <Panel title="Run" className="self-start">
           <RunTimeline steps={buildTimeline(events)} pending={!status || status === 'running'} />
           {disconnected && status === 'running' ? (
-            <p className="border-t px-4 py-2 text-xs text-warning">Live updates stopped. Reload to reconnect.</p>
+            <p className="border-t px-4 py-2 text-xs text-warning">
+              Live updates stopped. Reload to reconnect.
+            </p>
           ) : null}
         </Panel>
         <div className="min-w-0">
@@ -112,7 +117,8 @@ export function PlanRunPage() {
               <div className="flex flex-col items-start gap-3 p-4">
                 <p>
                   <span className="font-mono">{formatProjectId(run.project_id)}</span> is saved with
-                  its tasks, dependencies and recommended owners. Every assignment is in the audit log.
+                  its tasks, dependencies and recommended owners. Every assignment is in the audit
+                  log.
                 </p>
                 <div className="flex gap-2">
                   <Link to={`/projects/${run.project_id}`} className={PRIMARY}>

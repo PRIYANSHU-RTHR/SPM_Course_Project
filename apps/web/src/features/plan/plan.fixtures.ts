@@ -71,8 +71,20 @@ export const REVIEW: PlanReview = {
     meets_deadline: true,
     critical_path: ['T-001', 'T-002'],
     tasks: [
-      { task_id: 'T-001', start: '2026-11-16', end: '2026-11-17', total_slack_hours: 0, critical: true },
-      { task_id: 'T-002', start: '2026-11-18', end: '2026-11-20', total_slack_hours: 0, critical: true },
+      {
+        task_id: 'T-001',
+        start: '2026-11-16',
+        end: '2026-11-17',
+        total_slack_hours: 0,
+        critical: true,
+      },
+      {
+        task_id: 'T-002',
+        start: '2026-11-18',
+        end: '2026-11-20',
+        total_slack_hours: 0,
+        critical: true,
+      },
     ],
   },
   recommendations: {

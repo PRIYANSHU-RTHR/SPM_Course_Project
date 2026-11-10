@@ -87,8 +87,8 @@ export function NewPlanPage() {
   return (
     <>
       <PageHeader label="New project" title="Plan from a brief">
-        The planning workflow turns the brief into a WBS, estimates it, schedules it and
-        recommends owners. You review the plan before anything is saved.
+        The planning workflow turns the brief into a WBS, estimates it, schedules it and recommends
+        owners. You review the plan before anything is saved.
       </PageHeader>
       <form onSubmit={submit} className="flex max-w-3xl flex-col gap-4">
         <div className="flex flex-wrap items-center gap-3">
