@@ -32,6 +32,7 @@ describe('format', () => {
     expect(formatRupees(1250000)).toBe('₹12,50,000')
     expect(formatRupees('620000.00')).toBe('₹6,20,000')
     expect(formatRupees('850.50', 2)).toBe('₹850.50')
+    expect(formatRupees('-17227.00')).toBe('−₹17,227')
   })
 
   it('reads date-only strings as local dates', () => {

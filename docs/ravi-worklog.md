@@ -12,10 +12,10 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 |---|---|---|---|
 | 18 | Web scaffold and design system | Merged | Nothing |
 | 04 | Seed data | Merged | Nothing |
-| 19 | Projects list and overview | Done, on `feat/19-overview`, no PR yet | PR and review |
-| 21 | Network graph and Gantt | Next | Step 19 merged. Real data is ready |
-| 23 | Risk, EVM and forecast views | Ready after 19 | AI plans need Step 16 merged |
-| 22 | Team and assignment views | Ready after 19 | AI explanations need Step 16 merged |
+| 19 | Projects list and overview | Done, in [PR #5](https://github.com/PRIYANSHU-RTHR/SPM_Course_Project/pull/5), not merged | PR review by a teammate |
+| 21 | Network graph and Gantt | Done, on `feat/21-network-gantt`, no PR yet | PR after PR #5 merges |
+| 23 | Risk, EVM and forecast views | Done, on `feat/23-risk-evm-forecast`, no PR yet | PR after Step 21 merges. Generate plan needs Step 16 |
+| 22 | Team and assignment views | Done, on `feat/22-team-assignments`, no PR yet | PR after Step 23 merges. AI explanations need Step 16 |
 | 20 | New project flow | Not started | Mock stream until Step 15 exists |
 | 24 (UI) | Disruption simulator, approvals, audit | Blocked | 17 and Priyanshu's Step 24 API work merged |
 | 27 | Docs, polish, deploy | Blocked | 26 merged |
@@ -29,9 +29,12 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 
 ## Next actions
 
-1. Open a PR for Step 19 and get it reviewed.
+1. Get PR #5 (Step 19) reviewed and merged.
 2. Raise the open questions below. The forecast one blocks the demo story.
-3. Start Step 21 on `feat/21-network-gantt`, branched from `main` after Step 19 merges.
+3. Open the Step 21 PR once Step 19 is on `main`.
+4. Open the Step 23 PR once Step 21 is on `main`.
+5. Open the Step 22 PR once Step 23 is on `main`.
+6. Step 20 is next. It needs a mock stream until Step 15 exists.
 
 ## Work done
 
@@ -101,19 +104,81 @@ Update this file at the end of every step. `docs/temp.md` stays the detailed, lo
 - An empty project shows no metrics. The forecast engine reports 100% on time for it, which would mislead.
 - Recharts loads only on pages with a chart.
 
+### Step 21 · Network graph and Gantt (2026-11-06)
+
+**Built**
+
+- `/projects/:id/schedule` with Network and Gantt tabs, on real data.
+- Network: dependency graph with the critical path highlighted and a critical-only toggle.
+- Gantt: grouped by epic, owner colours, hatched slack, today and deadline lines, weekend shading, Day and Week zoom, and dependency lines on hover.
+- Task details open from either view.
+- The header shows when the finish is past the deadline: currently 4 working days.
+
+**Checked**
+
+- Typecheck, lint, 45 web tests and build pass.
+- Tested on real data at 1440px and 390px, including an empty project and a missing project.
+- Only tested with 25 tasks, not the 50 in the brief.
+
+**Decisions**
+
+- Branched from Step 19, because Step 21 builds on it and PR #5 is still waiting.
+- The network opens at a readable zoom instead of fitting everything.
+- Added a deadline line, which the brief did not ask for, so the overrun is visible.
+
+### Step 23 · Risk, EVM and forecast views (2026-11-06)
+
+**Built**
+
+- `/projects/:id/risks`: P×I matrix with click-to-filter, risk register, and a detail sheet with evidence and the RMMM plan.
+- `/projects/:id/control`: 8 EVM KPIs, S-curve, P(on time), finish-date histogram, CDF with P50, P80 and P95, and the top tasks by criticality.
+- Control is now in the left rail and the ⌘K palette.
+
+**Checked**
+
+- Typecheck, lint, tests and build pass.
+- Tested on real data at 1440px and 390px, including an empty project and a missing project.
+- The plan display was tested with one faked response, because the endpoint is not on `main`. The mock handler itself has not run.
+
+**Decisions**
+
+- Generate plan is built to the Step 16 format. On the real API it shows a clear message until Step 16 merges.
+- Owner role comes from the RMMM plan, so it is empty until a plan exists.
+
+### Step 22 · Team and assignment views (2026-11-06)
+
+**Built**
+
+- `/projects/:id/team`: skills matrix with bus-factor warnings and a capacity heatmap by ISO week, with clickable cells.
+- Assignments table with a Greedy and Optimal toggle and a compare strip.
+- Recommendation sheet: top candidates with stacked score bars, ineligible members with reasons, Approve and Override.
+
+**Checked**
+
+- Typecheck, lint, 73 web tests and build pass.
+- Tested at 1440px and 390px, including an empty project and a missing project.
+- Approve and Override ran against the real API and wrote to the audit log. Demo data was reseeded afterwards.
+
+**Decisions**
+
+- The page reads both `score` and `total`, and new rows store both, so either team decision works.
+- Approve and Override are hidden on done tasks.
+- Override can pick any member. Ineligible members are marked, because a PM may knowingly accept that.
+
 ## Future requirements
 
 ### For my next steps
 
-- **Step 21:** build the dependency network and Gantt. It will show the 7 December finish next to 82% on time.
 - **After Step 17:** retune the seed so "Bob on leave" lands near the plan.md §4 numbers: 47%, then about 74% after approval.
-- **Step 23:** add `/projects/:id/control` and decide where it sits in the left rail.
+- **After Step 16 merges:** run `pnpm gen:api`, test Generate plan, and delete its mock handler.
 - **Step 27:** add the `g p` and `?` shortcuts, and fix the 543 kB main JS chunk with route-level code splitting.
 - **After API changes:** run `pnpm gen:api` and fix any type errors.
 
 ### Questions for the team
 
-- [ ] **Priyanshu, Manveer:** agree one `risk.rmmm` format before Step 23. The Step 03 model says `mitigation, monitoring, management`; the Step 16 prompt says `mitigation, monitoring_trigger, contingency, owner_role`.
+- [ ] **Manveer:** greedy beats optimal on the seed: 2,248 vs 2,237. The plan says optimal should win. Is the seed or the engine the reason?
+- [ ] **Team:** 12 of 14 skills show a bus-factor warning. Keep the rule, or limit it to critical tasks?
+- [ ] **Manveer:** merge Step 16, then Generate plan can be tested on the real API. The `rmmm` format is settled by that branch.
 - [ ] **Team:** should projects have an owner? The Step 19 brief lists an owner column, but the project table has no such field.
 - [ ] **Priyanshu:** `ruff check` fails at `app/agents/llm.py:12` (line too long), which will fail CI in Step 25.
 - [ ] **Manveer, Priyanshu:** `forecast()` reads only tasks, so it ignores members, leave and progress. "Bob on leave" cannot drop P(on time) from 81% to 47% until Step 17 feeds leave into it.
