@@ -27,12 +27,13 @@ export function formatPercent(ratio: Maybe<number>, digits = 0): string {
 export function formatRupees(amount: Maybe<number | string>, digits = 0): string {
   const value = typeof amount === 'string' ? Number(amount) : amount
   if (isMissing(value)) return EMPTY
-  return new Intl.NumberFormat('en-IN', {
+  const formatted = new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(value)
+  return formatted.replace('-', '−')
 }
 
 /** Date-only strings are read as local dates, so they never shift a day across time zones. */
@@ -70,6 +71,12 @@ export function formatTaskId(id: Maybe<number>): string {
 export function formatProjectId(id: Maybe<number>): string {
   if (isMissing(id)) return EMPTY
   return `P-${String(id).padStart(3, '0')}`
+}
+
+/** 7 → "R-007". */
+export function formatRiskId(id: Maybe<number>): string {
+  if (isMissing(id)) return EMPTY
+  return `R-${String(id).padStart(3, '0')}`
 }
 
 /** A plain ratio such as SPI: 0.9389 → "0.94". */

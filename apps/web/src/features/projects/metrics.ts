@@ -8,6 +8,19 @@ import type {
   WeekLoad,
 } from '@/lib/api/schemas'
 
+/** Below 0.9 matches the risk engine's SPI and CPI rule; below 1 is behind plan. */
+export function indexStatus(value: number | null | undefined) {
+  if (value == null) return undefined
+  if (value < 0.9) return 'danger'
+  return value < 1 ? 'warning' : undefined
+}
+
+/** Below 60% matches the risk engine's P(on time) rule. */
+export function forecastStatus(value: number) {
+  if (value < 0.6) return 'danger'
+  return value < 0.8 ? 'warning' : undefined
+}
+
 export function hasPlan(evm: ProjectEvm): boolean {
   return Number(evm.bac) > 0
 }

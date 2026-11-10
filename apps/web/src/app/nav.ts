@@ -1,4 +1,5 @@
 import {
+  Activity,
   ChartGantt,
   ClipboardCheck,
   History,
@@ -27,6 +28,7 @@ export function navItems(projectId: number | undefined): NavItem[] {
     { label: 'Schedule', icon: ChartGantt, to: inProject('/schedule') },
     { label: 'Team', icon: Users, to: inProject('/team') },
     { label: 'Risks', icon: ShieldAlert, to: inProject('/risks') },
+    { label: 'Control', icon: Activity, to: inProject('/control') },
     { label: 'Approvals', icon: ClipboardCheck, to: '/approvals' },
     { label: 'Audit', icon: History, to: '/audit' },
   ]
