@@ -15,7 +15,6 @@ import { CandidateCard } from './CandidateCard'
 import { ExplanationBlock } from './ExplanationBlock'
 import { type AssignmentRow, toBreakdown } from './teamMetrics'
 
-
 interface RecommendationSheetProps {
   projectId: number
   mode: AssignmentMode

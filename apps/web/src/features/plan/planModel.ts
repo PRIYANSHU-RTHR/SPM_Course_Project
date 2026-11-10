@@ -8,7 +8,7 @@ import type {
   WorkflowStatus,
 } from '@/lib/api/schemas'
 
-/** Graph nodes of `app/workflows/plan.py`, in run order. */
+/** Graph nodes of `app/workflows/plan.py` and `reallocate.py`, in run order. */
 export const NODE_LABELS: Record<string, string> = {
   decompose: 'Decompose brief',
   validate: 'Validate WBS',
@@ -17,6 +17,12 @@ export const NODE_LABELS: Record<string, string> = {
   recommend: 'Assign owners',
   pm_review: 'PM review',
   commit: 'Create project',
+  apply_event: 'Record disruption',
+  recompute: 'Recompute risks',
+  propose: 'Propose owners',
+  pm_approval: 'PM approval',
+  apply: 'Apply owners',
+  recompute_final: 'Recompute plan',
 }
 
 export const TERMINAL: ReadonlySet<WorkflowStatus> = new Set(['committed', 'rejected', 'failed'])
