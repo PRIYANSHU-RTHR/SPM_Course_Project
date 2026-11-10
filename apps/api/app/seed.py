@@ -46,7 +46,9 @@ CENTS = Decimal("0.01")
 HOURS_PER_DAY = 8.0  # one project day of effort, matching the engines' working calendar
 DAYS_ELAPSED = 15  # working days between project start and today: 3 weeks
 SNAPSHOT_DAYS = 10  # 2 weeks of working-day snapshots, ending today
-DEADLINE_WORKING_DAYS = 33  # tuned so Monte Carlo gives about 80% P(on time)
+# Tuned so the resource-adjusted forecast (services/scenario.py, as on every page) gives about
+# 80% P(on time); the plan.md demo then reads 82% -> 11% (one week of leave) -> 58% approved.
+DEADLINE_WORKING_DAYS = 34
 TARGET_SPI = Decimal("0.94")  # sets stored PV; matches the EVM engine on this data
 HOURLY_RATE = Decimal("850.00")
 BUDGET = Decimal("520000.00")
