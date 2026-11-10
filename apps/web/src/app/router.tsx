@@ -1,16 +1,18 @@
 import { createBrowserRouter, Navigate } from 'react-router'
 import { AppShell } from '@/components/shell/AppShell'
-import { ControlPage } from '@/features/control/ControlPage'
-import { ApprovalsPage } from '@/features/disruptions/ApprovalsPage'
-import { AuditPage } from '@/features/disruptions/AuditPage'
-import { NewPlanPage } from '@/features/plan/NewPlanPage'
-import { PlanRunPage } from '@/features/plan/PlanRunPage'
-import { OverviewPage } from '@/features/projects/OverviewPage'
-import { ProjectsPage } from '@/features/projects/ProjectsPage'
-import { RisksPage } from '@/features/risks/RisksPage'
-import { SchedulePage } from '@/features/schedule/SchedulePage'
-import { StyleguidePage } from '@/features/styleguide/StyleguidePage'
-import { TeamPage } from '@/features/team/TeamPage'
+import {
+  ApprovalsPage,
+  AuditPage,
+  ControlPage,
+  NewPlanPage,
+  OverviewPage,
+  PlanRunPage,
+  ProjectsPage,
+  RisksPage,
+  SchedulePage,
+  StyleguidePage,
+  TeamPage,
+} from './lazyPages'
 import { ErrorPage } from './pages/ErrorPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
